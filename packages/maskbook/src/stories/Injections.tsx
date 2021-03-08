@@ -304,7 +304,8 @@ function FakePost(props: React.PropsWithChildren<{ title: string }>) {
 
 const redpacket: RedPacketJSONPayload = {
     contract_address: 'addr',
-    txid: 'rpid',
+    contract_version: 1,
+    txid: 'txid',
     creation_time: Date.now(),
     duration: 2000,
     is_random: true,

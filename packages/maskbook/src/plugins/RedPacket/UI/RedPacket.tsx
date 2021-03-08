@@ -184,8 +184,17 @@ export function RedPacket(props: RedPacketProps) {
                   .join('\n')
             : '',
     )
-    const [claimState, claimCallback, resetClaimCallback] = useClaimCallback(account, payload.rpid, payload.password)
-    const [refundState, refundCallback, resetRefundCallback] = useRefundCallback(account, payload.rpid)
+    const [claimState, claimCallback, resetClaimCallback] = useClaimCallback(
+        payload.contract_version,
+        account,
+        payload.rpid,
+        payload.password,
+    )
+    const [refundState, refundCallback, resetRefundCallback] = useRefundCallback(
+        payload.contract_version,
+        account,
+        payload.rpid,
+    )
 
     // close the transaction dialog
     const [_, setTransactionDialogOpen] = useRemoteControlledDialog(
