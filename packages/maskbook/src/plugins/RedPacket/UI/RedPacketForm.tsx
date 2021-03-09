@@ -346,7 +346,7 @@ export function RedPacketForm(props: RedPacketFormProps) {
             </div>
             <EthereumWalletConnectedBoundary>
                 <EthereumERC20TokenApprovedBoundary
-                    amount={amount.toFixed()}
+                    amount={totalAmount.toFixed()}
                     token={token?.type === EthereumTokenType.ERC20 ? token : undefined}
                     spender={RED_PACKET_ADDRESS}>
                     <ActionButton variant="contained" className={classes.button} fullWidth onClick={createCallback}>
