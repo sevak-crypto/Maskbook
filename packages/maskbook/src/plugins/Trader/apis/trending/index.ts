@@ -12,6 +12,7 @@ import STOCKS_KEYWORDS from './stocks.json'
 import CASHTAG_KEYWORDS from './cashtag.json'
 import HASHTAG_KEYWORDS from './hashtag.json'
 import { unreachable } from '../../../../utils/utils'
+import { subscribeCMCPrice, unSubscribeCMCPrice } from '../coinmarketcap/getLatestPrice'
 
 export async function getCurrenies(dataProvider: DataProvider): Promise<Currency[]> {
     switch (dataProvider) {
@@ -403,4 +404,14 @@ export async function getPriceStats(
     )
     if (stats.data.is_active === 0) return []
     return Object.entries(stats.data).map(([date, x]) => [date, x[currency.name.toUpperCase()][0]])
+}
+
+export function getLatestPrice(coinId: string | undefined) {
+    if(coinId) {
+        subscribeCMCPrice(Number(coinId))
+    }
+}
+
+export function unSubscribe() {
+    unSubscribeCMCPrice()
 }

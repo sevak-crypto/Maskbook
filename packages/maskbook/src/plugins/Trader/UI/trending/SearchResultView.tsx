@@ -25,6 +25,7 @@ import { LBPPanel } from './LBPPanel'
 import { useLBP } from '../../LBP/useLBP'
 import { createERC20Token } from '../../../../web3/helpers'
 import { useChainId } from '../../../../web3/hooks/useChainState'
+import { useCoinLatestPrice } from '../../trending/useCoinLatestPrice'
 
 const useStyles = makeStyles((theme) => {
     return createStyles({
@@ -124,6 +125,8 @@ export function SearchResultView(props: SearchResultViewProps) {
         tokenDetailed,
     })
     //#endregion
+
+    useCoinLatestPrice(trending?.coin.id)
 
     //#region trader context
     const tradeContext = useTradeContext(tradeProvider)

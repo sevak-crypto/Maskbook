@@ -30,6 +30,15 @@ export const currentDataProviderSettings = createGlobalSettings<DataProvider>(
 )
 
 /**
+ * The coin price from coin market cap
+ */
+export const currentCoinPriceFromCMC = createInternalSettings(
+    `${PLUGIN_IDENTIFIER}+coinPriceFromCMC`,
+    stringify([]),
+)
+
+
+/**
  * The default trader provider
  */
 export const currentTradeProviderSettings = createGlobalSettings<TradeProvider>(

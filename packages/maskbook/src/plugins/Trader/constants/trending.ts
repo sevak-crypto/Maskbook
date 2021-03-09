@@ -19,6 +19,9 @@ export const BTC_FIRST_LEGER_DATE = new Date('2009-01-03T00:00:00.000Z')
 //#region settings about trader
 export const CRYPTOCURRENCY_MAP_EXPIRES_AT = 60 /* seconds */ * 1000 /* milliseconds */
 
+//#region get coin latest price from coin market cap
+export const CMC_LATEST_BASE_URL = 'wss://stream.coinmarketcap.com/price/latest'
+
 export const TRENDING_CONSTANTS = {
     UNISWAP_V2_SUBGRAPH_URL: {
         [ChainId.Mainnet]: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
