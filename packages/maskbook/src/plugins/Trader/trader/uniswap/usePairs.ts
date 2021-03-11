@@ -32,7 +32,7 @@ export function usePairs(tokenPairs: readonly TokenPair[]) {
     // get reserves for each pair
     const contracts = usePairContracts([...new Set(listOfPairAddress.filter(Boolean) as string[])])
     const [results, calls, _, callback] = useMutlipleContractSingleData(
-        contracts as unknown as Contract[],
+        (contracts as unknown) as Contract[],
         new Array(contracts.length).fill('getReserves'),
         [],
     )

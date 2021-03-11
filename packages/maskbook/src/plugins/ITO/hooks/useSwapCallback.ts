@@ -114,7 +114,7 @@ export function useSwapCallback(
                       Web3Utils.sha3(account)!,
                       swapTokenAt,
                       total,
-                ] as Parameters<MaskITO['swap']>)
+                  ] as Parameters<MaskITO['swap']>)
                 : ([
                       id,
                       Web3Utils.soliditySha3(
@@ -125,7 +125,7 @@ export function useSwapCallback(
                       Web3Utils.sha3(account)!,
                       swapTokenAt,
                       total,
-                ] as Parameters<ITO['swap']>)
+                  ] as Parameters<ITO['swap']>)
 
         const swap = isMask && testNums ? (ITO_Contract as MaskITO).swap : (ITO_Contract as ITO).swap
 

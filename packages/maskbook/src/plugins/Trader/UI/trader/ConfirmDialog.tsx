@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, makeStyles, createStyles, DialogActions, DialogContent, Typography } from '@material-ui/core'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import type { BigNumber } from 'ethers'
+import type BigNumber from 'bignumber.js'
 import { useStylesExtends } from '../../../../components/custom-ui-helper'
 import { TradeSummary, TradeSummaryProps } from '../trader/TradeSummary'
 import { TokenPanel } from './TokenPanel'

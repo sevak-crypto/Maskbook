@@ -1,4 +1,4 @@
-import type { BigNumber } from 'ethers'
+import type BigNumber from 'bignumber.js'
 import { useAsyncRetry } from 'react-use'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useAirdropContract } from '../contracts/useAirdropContract'

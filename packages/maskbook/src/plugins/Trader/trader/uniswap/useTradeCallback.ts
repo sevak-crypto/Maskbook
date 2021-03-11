@@ -49,8 +49,7 @@ export function useTradeCallback(
                 const { methodName, args, value } = x
                 const config = !value || /^0x0*$/.test(value) ? {} : { value }
                 // @ts-ignore
-                return routerV2Contract
-                    .estimateGas[methodName as keyof typeof routerV2Contract](...args)
+                return routerV2Contract.estimateGas[methodName as keyof typeof routerV2Contract](...args)
                     .then(
                         (gasEstimated) =>
                             ({

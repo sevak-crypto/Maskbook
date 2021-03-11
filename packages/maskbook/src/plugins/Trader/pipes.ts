@@ -1,4 +1,4 @@
-import type { BigNumber } from 'ethers'
+import type BigNumber from 'bignumber.js'
 import { Currency, DataProvider, TradeProvider, WarningLevel, ZrxTradePool } from './types'
 import { unreachable } from '../../utils/utils'
 import {

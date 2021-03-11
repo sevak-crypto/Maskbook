@@ -19,14 +19,8 @@ export function useTradeComputed(
 ) {
     const inputTokenProduct = new BigNumber(10).pow(inputToken?.decimals ?? 0)
     const outputTokenProduct = new BigNumber(10).pow(outputToken?.decimals ?? 0)
-    const inputAmount_ = new BigNumber(inputAmount || '0')
-        .multipliedBy(inputTokenProduct)
-        .integerValue()
-        .toString()
-    const outputAmount_ = new BigNumber(outputAmount || '0')
-        .multipliedBy(outputTokenProduct)
-        .integerValue()
-        .toString()
+    const inputAmount_ = new BigNumber(inputAmount || '0').multipliedBy(inputTokenProduct).integerValue().toString()
+    const outputAmount_ = new BigNumber(outputAmount || '0').multipliedBy(outputTokenProduct).integerValue().toString()
 
     // uniswap like providers
     const uniswap_ = useUniswapTrade(

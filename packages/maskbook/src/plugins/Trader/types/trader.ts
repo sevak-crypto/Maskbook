@@ -1,4 +1,4 @@
-import type { BigNumber } from 'ethers'
+import type BigNumber from 'bignumber.js'
 import type { ChainId, ERC20TokenDetailed, EtherTokenDetailed } from '../../../web3/types'
 
 export enum TradeProvider {

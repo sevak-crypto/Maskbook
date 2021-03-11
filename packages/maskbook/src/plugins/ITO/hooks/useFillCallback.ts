@@ -204,31 +204,31 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         }
         let params = isMask
             ? ([
-                sha256(signedPassword)!,
+                  sha256(signedPassword)!,
                   startTime_,
                   endTime_,
                   name,
                   title,
                   exchangeTokens.map((x) => x.address),
-                exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
+                  exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
                   token.address,
                   total,
                   limit,
                   DEFAULT_QUALIFICATION_ADDRESS,
-            ] as Parameters<MaskITO['fill_pool']>)
+              ] as Parameters<MaskITO['fill_pool']>)
             : ([
-                sha256(signedPassword)!,
+                  sha256(signedPassword)!,
                   startTime_,
                   endTime_,
                   name,
                   title,
                   exchangeTokens.map((x) => x.address),
-                exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
+                  exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
                   token.address,
                   total,
                   limit,
                   DEFAULT_QUALIFICATION_ADDRESS,
-            ] as Parameters<ITO['fill_pool']>)
+              ] as Parameters<ITO['fill_pool']>)
 
         // step 1: estimate gas
         const estimatedGas = await ITO_Contract.estimateGas.fill_pool(...params).catch((error: Error) => {

@@ -1,4 +1,4 @@
-import { BigNumber } from "@balancer-labs/sor/dist/utils/bignumber"
+import { BigNumber } from '@balancer-labs/sor/dist/utils/bignumber'
 
 // gasPrice is used by SOR as a factor to determine how many pools to swap against.
 // i.e. higher cost means more costly to trade against lots of different pools.

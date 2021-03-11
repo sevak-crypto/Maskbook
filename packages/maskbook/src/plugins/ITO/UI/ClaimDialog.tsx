@@ -255,7 +255,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
                     className={classes.swapLimitSlider}
                     value={Number(tokenAmount.div(maxSwapAmount).multipliedBy(100))}
                     onChange={(_, newValue) => {
-                    const tokenAmount = maxSwapAmount.multipliedBy((newValue as number) / 100)
+                        const tokenAmount = maxSwapAmount.multipliedBy((newValue as number) / 100)
                         const swapAmount = tokenAmount.multipliedBy(ratio).dp(0)
                         setTokenAmount(tokenAmount.dp(0))
                         setClaimAmount(swapAmount)

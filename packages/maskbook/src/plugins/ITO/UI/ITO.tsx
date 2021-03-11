@@ -344,7 +344,7 @@ export function ITO(props: ITO_Props) {
             if (token) {
                 summary +=
                     comma +
-                formatBalance(new BigNumber(availability?.exchanged_tokens[i]), token.decimals ?? 0) +
+                    formatBalance(new BigNumber(availability?.exchanged_tokens[i]), token.decimals ?? 0) +
                     ' ' +
                     token.symbol
             }
@@ -493,7 +493,9 @@ export function ITO(props: ITO_Props) {
                                     price={formatBalance(
                                         new BigNumber(exchange_amounts[i * 2])
                                             .div(new BigNumber(exchange_amounts[i * 2 + 1]))
-                                            .multipliedBy(new BigNumber(10).pow(token.decimals - exchange_tokens[i].decimals))
+                                            .multipliedBy(
+                                                new BigNumber(10).pow(token.decimals - exchange_tokens[i].decimals),
+                                            )
                                             .multipliedBy(new BigNumber(10).pow(exchange_tokens[i].decimals)),
                                         exchange_tokens[i].decimals,
                                     )}

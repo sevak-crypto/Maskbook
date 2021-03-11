@@ -59,14 +59,14 @@ export function useTradeCallback(
                       swap_,
                       inputTokenAddress,
                       outputTokenAddress,
-                    trade.inputAmount.toString(),
-                    tradeAmount.toString(),
+                      trade.inputAmount.toString(),
+                      tradeAmount.toString(),
                   )
                 : exchangeProxyContract.multihopBatchSwapExactOut(
                       swap_,
                       inputTokenAddress,
                       outputTokenAddress,
-                    tradeAmount.toString(),
+                      tradeAmount.toString(),
                   )
 
         const config: Tx = {

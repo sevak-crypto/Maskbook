@@ -22,7 +22,11 @@ export function useERC721TokenIdsOfOwner(token?: ERC721Token) {
     }, [account, asyncResultOfBalanceOf.value])
 
     // valdiate
-    const [results, calls, _, callback] = useSingleContractMultipleData(erc721Contract as unknown as Contract, names, callDatas)
+    const [results, calls, _, callback] = useSingleContractMultipleData(
+        (erc721Contract as unknown) as Contract,
+        names,
+        callDatas,
+    )
     const asyncResultOfMulticall = useAsyncRetry(() => callback(calls), [names, callDatas])
 
     // compose
