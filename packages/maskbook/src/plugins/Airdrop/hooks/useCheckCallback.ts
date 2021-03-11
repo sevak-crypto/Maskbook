@@ -90,9 +90,12 @@ export function useCheckCallback() {
 
                 // revalidate by contract
                 const { index, address, amount, proof } = packet
-                const { available, claimable, start, end } = await airdropContract
-                    .check(index, formatEthereumAddress(address), amount, proof)
-                    .call()
+                const { available, claimable, start, end } = await airdropContract.check(
+                    index,
+                    formatEthereumAddress(address),
+                    amount,
+                    proof,
+                )
 
                 const now = Date.now()
                 const start_ = Number.parseInt(start) * 1000

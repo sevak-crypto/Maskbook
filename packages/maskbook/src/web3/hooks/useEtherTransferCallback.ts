@@ -69,7 +69,7 @@ export function useEtherTransferCallback(amount?: string, recipient?: string, me
         const estimatedGas = await Services.Ethereum.estimateGas(config, chainId)
         const transaction = await Services.Ethereum.sendTransaction(account, {
             // the esitmated gas limit is too low with arbitrary message to be encoded as data (increase 20% gas limit)
-            gasLimit: addGasMargin(estimatedGas, 2000).toString(),
+            gasLimit: addGasMargin(estimatedGas, 2000).toFixed(),
             ...config,
         })
 

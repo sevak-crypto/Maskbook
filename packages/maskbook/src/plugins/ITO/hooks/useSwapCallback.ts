@@ -157,7 +157,7 @@ export function useSwapCallback(
                 })
                 reject(error)
             }
-            const promiEvent = swap(...swapParams).send({
+            const transaction = swap(...swapParams).send({
                 gas: addGasMargin(new BigNumber(estimatedGas)).toString(),
                 ...config,
             })

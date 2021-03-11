@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import type { TransactionReceipt } from 'web3-core'
 import BigNumber from 'bignumber.js'
 import { useAccount } from '../../../../web3/hooks/useAccount'
 import { useChainId } from '../../../../web3/hooks/useChainState'
@@ -9,9 +8,10 @@ import type { ExchangeProxy } from '@dimensiondev/contracts/types/ExchangeProxy'
 import { SLIPPAGE_TOLERANCE_DEFAULT, TRADE_CONSTANTS } from '../../constants'
 import { EthereumTokenType, TransactionEventType } from '../../../../web3/types'
 import { useConstant } from '../../../../web3/hooks/useConstant'
-import type { Tx } from '@dimensiondev/contracts/types/types'
 import { addGasMargin } from '../../../../web3/helpers'
 import { useTradeAmount } from './useTradeAmount'
+import type { TransactionRequest } from '@ethersproject/abstract-provider'
+import Services from '../../../../extension/service'
 
 export function useTradeCallback(
     trade: TradeComputed<SwapResponse> | null,
@@ -69,7 +69,7 @@ export function useTradeCallback(
                       tradeAmount.toString(),
                   )
 
-        const config: Tx = {
+        const config: TransactionRequest = {
             from: account,
             to: exchangeProxyContract.options.address,
             value: '0',
@@ -92,7 +92,7 @@ export function useTradeCallback(
 
         // step 2: blocking
         return new Promise<void>((resolve, reject) => {
-            const promiEvent = tx.send({
+            const transaction = await Services.Ethereum tx.send({
                 gas: addGasMargin(new BigNumber(estimatedGas)).toString(),
                 ...config,
             })

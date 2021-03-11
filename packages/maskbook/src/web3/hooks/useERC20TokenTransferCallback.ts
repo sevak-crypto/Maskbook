@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 import { EthereumAddress } from 'wallet.ts'
 import BigNumber from 'bignumber.js'
-import type { TransactionReceipt } from '@ethersproject/providers'
 import { useAccount } from './useAccount'
 import { useERC20TokenContract } from '../contracts/useERC20TokenContract'
 import { TransactionStateType, useTransactionState } from './useTransactionState'
-import { TransactionEventType } from '../types'
+import Services from '../../extension/service'
+import { StageType } from '../../extension/background-script/EthereumService'
 
 export function useERC20TokenTransferCallback(address: string, amount?: string, recipient?: string) {
     const account = useAccount()
@@ -30,7 +30,7 @@ export function useERC20TokenTransferCallback(address: string, amount?: string, 
         }
 
         // error: insufficent balance
-        const balance = await erc20Contract.balanceOf(account).call()
+        const balance = await erc20Contract.balanceOf(account)
 
         if (new BigNumber(amount).isGreaterThan(new BigNumber(balance))) {
             setTransferState({
@@ -46,40 +46,40 @@ export function useERC20TokenTransferCallback(address: string, amount?: string, 
         })
 
         // step 1: estimate gas
-        const estimatedGas = await erc20Contract.transfer(recipient, amount).estimateGas({
-            from: account,
-            to: erc20Contract.options.address,
-        })
+        const estimatedGas = await erc20Contract.estimateGas.transfer(recipient, amount)
 
         // step 2: blocking
         return new Promise<void>(async (resolve, reject) => {
-            const promiEvent = erc20Contract.transfer(recipient, amount).send({
-                from: account,
-                to: erc20Contract.options.address,
-                gas: estimatedGas,
+            const transaction = await erc20Contract.transfer(recipient, amount, {
+                gasLimit: estimatedGas,
             })
-            promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
-                setTransferState({
-                    type: TransactionStateType.CONFIRMED,
-                    no: 0,
-                    receipt,
-                })
-            })
-            promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
-                setTransferState({
-                    type: TransactionStateType.CONFIRMED,
-                    no,
-                    receipt,
-                })
-                resolve()
-            })
-            promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
-                setTransferState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                reject(error)
-            })
+
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.RECEIPT:
+                        setTransferState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: 0,
+                            receipt: stage.receipt,
+                        })
+                        break
+                    case StageType.CONFIRMATION:
+                        setTransferState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: stage.no,
+                            receipt: stage.receipt,
+                        })
+                        resolve()
+                        break
+                    case StageType.ERROR:
+                        setTransferState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [account, address, amount, recipient, erc20Contract])
 
