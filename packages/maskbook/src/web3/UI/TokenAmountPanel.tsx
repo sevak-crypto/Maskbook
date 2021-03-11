@@ -11,11 +11,11 @@ import {
     TextFieldProps,
 } from '@material-ui/core'
 import classNames from 'classnames'
-import { formatUnits } from 'ethers/lib/utils'
 import { SelectTokenChip, SelectTokenChipProps } from './SelectTokenChip'
 import { MIN_AMOUNT_LENGTH, MAX_AMOUNT_LENGTH } from '../constants'
 import { useStylesExtends } from '../../components/custom-ui-helper'
 import type { EtherTokenDetailed, ERC20TokenDetailed } from '../types'
+import { formatBalance } from '../../plugins/Wallet/number'
 
 const useStyles = makeStyles((theme) => {
     return createStyles({
@@ -129,7 +129,7 @@ export function TokenAmountPanel(props: TokenAmountPanelProps) {
                                 color="textSecondary"
                                 variant="body2"
                                 component="span">
-                                Balance: {formatUnits(balance, token.decimals)}
+                                Balance: {formatBalance(balance, token.decimals)}
                             </Typography>
                         ) : null}
                         <Box
@@ -150,7 +150,7 @@ export function TokenAmountPanel(props: TokenAmountPanelProps) {
                                     color="primary"
                                     variant="outlined"
                                     onClick={() => {
-                                        onAmountChange(formatUnits(maxAmount ?? balance, token.decimals))
+                                        onAmountChange(formatBalance(maxAmount ?? balance, token.decimals))
                                     }}
                                     {...MaxChipProps}
                                 />

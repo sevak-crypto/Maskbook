@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { makeStyles, createStyles, Typography, DialogContent, Link } from '@material-ui/core'
 import { BigNumber } from 'ethers'
-import { formatUnits, parseUnits } from 'ethers/lib/utils'
+import { parseUnits } from 'ethers/lib/utils'
 import { Trans } from 'react-i18next'
 import { v4 as uuid } from 'uuid'
 
@@ -29,6 +29,7 @@ import { EthereumWalletConnectedBoundary } from '../../../web3/UI/EthereumWallet
 import { EthereumERC20TokenApprovedBoundary } from '../../../web3/UI/EthereumERC20TokenApprovedBoundary'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import { GITCOIN_CONSTANT } from '../constants'
+import { formatBalance } from '../../Wallet/number'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -134,7 +135,7 @@ export function DonateDialog(props: DonateDialogProps) {
     const shareLink = useShareLink(
         token
             ? [
-                  `I just donated ${title} with ${formatUnits(amount, token.decimals)} ${cashTag}${
+                `I just donated ${title} with ${formatBalance(amount, token.decimals)} ${cashTag}${
                       token.symbol
                   }. Follow @realMaskbook (mask.io) to donate Gitcoin grants.`,
                   '#mask_io',
@@ -161,7 +162,7 @@ export function DonateDialog(props: DonateDialogProps) {
             open: true,
             shareLink,
             state: donateState,
-            summary: `Donating ${formatUnits(amount, token.decimals)} ${token.symbol} for ${title}.`,
+            summary: `Donating ${formatBalance(amount, token.decimals)} ${token.symbol} for ${title}.`,
         })
     }, [donateState /* update tx dialog only if state changed */])
     //#endregion

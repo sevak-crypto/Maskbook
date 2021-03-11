@@ -18,6 +18,7 @@
     "@ethersproject/abstract-provider": "^5.0.10",
     "@ethersproject/abstract-signer": "^5.0.14",
     "@ethersproject/address": "^5.0.4",
+    "@ethersproject/bignumber": "^5.0.15",
     "@ethersproject/bytes": "^5.0.11",
     "@ethersproject/contracts": "^5.0.4",
     "@ethersproject/networks": "^5.0.4",
