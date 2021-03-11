@@ -35,7 +35,7 @@ import { FixedTokenList } from '../DashboardComponents/FixedTokenList'
 import { isETH } from '../../../web3/helpers'
 import { WalletRPC } from '../../../plugins/Wallet/messages'
 
-//#region predefined token selector
+//#region predefined token selector../../../plugins/RedPacket/UI/RedPacketHistoryList
 const useERC20PredefinedTokenSelectorStyles = makeStyles((theme) =>
     createStyles({
         list: {

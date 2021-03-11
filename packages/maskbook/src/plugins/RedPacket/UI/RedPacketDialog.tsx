@@ -6,7 +6,7 @@ import { editActivatedPostMetadata } from '../../../social-network/ui'
 import { RedPacketMetaKey } from '../constants'
 import { useI18N } from '../../../utils/i18n-next-ui'
 import { RedPacketForm } from './RedPacketForm'
-import { RedPacketBacklogList } from './RedPacketList'
+import { RedPacketHistoryList } from './RedPacketHistoryList'
 import { PortalShadowRoot } from '../../../utils/shadow-root/ShadowRootPortal'
 import { InjectedDialog } from '../../../components/shared/InjectedDialog'
 
@@ -49,7 +49,7 @@ export default function RedPacketDialog(props: RedPacketDialogProps) {
             },
             {
                 label: t('plugin_red_packet_select_existing'),
-                children: <RedPacketBacklogList onSelect={onCreateOrSelect} onClose={onClose} />,
+                children: <RedPacketHistoryList onSelect={onCreateOrSelect} onClose={onClose} />,
                 sx: { p: 0 },
             },
         ],
