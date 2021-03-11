@@ -113,7 +113,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
     const MASK_ITO_CONTRACT_ADDRESS = useConstant(ITO_CONSTANTS, 'MASK_ITO_CONTRACT_ADDRESS')
 
     const [ratio, setRatio] = useState<BigNumber>(
-        new BigNumber(payload.exchange_amounts[0 * 2]).div(new BigNumber(payload.exchange_amounts[0 * 2 + 1])),
+        new BigNumber(payload.exchange_amounts[0 * 2]).dividedBy(new BigNumber(payload.exchange_amounts[0 * 2 + 1])),
     )
     const [claimToken, setClaimToken] = useState<EtherTokenDetailed | ERC20TokenDetailed>(payload.exchange_tokens[0])
     const [claimAmount, setClaimAmount] = useState<BigNumber>(tokenAmount.multipliedBy(ratio))
@@ -144,7 +144,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
             (ev: SelectTokenDialogEvent) => {
                 if (ev.open || !ev.token || ev.uuid !== id) return
                 const at = exchangeTokens.findIndex((x) => isSameAddress(x.address, ev.token!.address))
-                const ratio = new BigNumber(payload.exchange_amounts[at * 2]).div(
+                const ratio = new BigNumber(payload.exchange_amounts[at * 2]).dividedBy(
                     new BigNumber(payload.exchange_amounts[at * 2 + 1]),
                 )
                 setRatio(ratio)
@@ -191,7 +191,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
     //#endregion
 
     //#region maxAmount for TokenAmountPanel
-    const maxAmount = useMemo(() => BigNumber.min(maxSwapAmount.multipliedBy(ratio).dp(0), tokenBalance).toString(), [
+    const maxAmount = useMemo(() => BigNumber.min(maxSwapAmount.multipliedBy(ratio).dp(0), tokenBalance).toFixed(), [
         maxSwapAmount,
         ratio,
         tokenBalance,
@@ -202,7 +202,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
     const [claimState, claimCallback, resetClaimCallback] = useSwapCallback(
         payload.pid,
         payload.password,
-        claimAmount.toString(),
+        claimAmount.toFixed(),
         claimToken,
         payload.test_nums,
         payload.is_mask,
@@ -240,9 +240,9 @@ export function ClaimDialog(props: ClaimDialogProps) {
 
     const validationMessage = useMemo(() => {
         if (claimAmount.isEqualTo(0)) return t('plugin_ito_error_enter_amount')
-        if (claimAmount.gt(new BigNumber(tokenBalance)))
+        if (claimAmount.isGreaterThan(new BigNumber(tokenBalance)))
             return t('plugin_ito_error_balance', { symbol: claimToken.symbol })
-        if (tokenAmount.gt(maxSwapAmount)) return t('plugin_ito_dialog_claim_swap_exceed_wallet_limit')
+        if (tokenAmount.isGreaterThan(maxSwapAmount)) return t('plugin_ito_dialog_claim_swap_exceed_wallet_limit')
     }, [claimAmount, tokenBalance, maxSwapAmount, claimToken, ratio])
 
     return (
@@ -253,7 +253,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
                 </Typography>
                 <Slider
                     className={classes.swapLimitSlider}
-                    value={Number(tokenAmount.div(maxSwapAmount).multipliedBy(100))}
+                    value={Number(tokenAmount.dividedBy(maxSwapAmount).multipliedBy(100))}
                     onChange={(_, newValue) => {
                         const tokenAmount = maxSwapAmount.multipliedBy((newValue as number) / 100)
                         const swapAmount = tokenAmount.multipliedBy(ratio).dp(0)
@@ -283,11 +283,14 @@ export function ClaimDialog(props: ClaimDialogProps) {
                             ? new BigNumber(0)
                             : new BigNumber(value).multipliedBy(new BigNumber(10).pow(claimToken.decimals))
                     const isMax = value === formatBalance(new BigNumber(maxAmount), claimToken.decimals)
-                    const tokenAmount = isMax ? maxSwapAmount : val.div(ratio)
+                    const tokenAmount = isMax ? maxSwapAmount : val.dividedBy(ratio)
                     const swapAmount = isMax ? tokenAmount.multipliedBy(ratio) : val.dp(0)
                     setInputAmountForUI(
                         isMax
-                            ? tokenAmount.multipliedBy(ratio).div(new BigNumber(10).pow(claimToken.decimals)).toString()
+                            ? tokenAmount
+                                  .multipliedBy(ratio)
+                                  .dividedBy(new BigNumber(10).pow(claimToken.decimals))
+                                  .toString()
                             : value,
                     )
                     setTokenAmount(tokenAmount.dp(0))
@@ -306,7 +309,7 @@ export function ClaimDialog(props: ClaimDialogProps) {
             <section className={classes.swapButtonWrapper}>
                 <EthereumWalletConnectedBoundary>
                     <EthereumERC20TokenApprovedBoundary
-                        amount={claimAmount.toString()}
+                        amount={claimAmount.toFixed()}
                         spender={payload.is_mask ? MASK_ITO_CONTRACT_ADDRESS : ITO_CONTRACT_ADDRESS}
                         token={claimToken.type === EthereumTokenType.ERC20 ? claimToken : undefined}>
                         <ActionButton

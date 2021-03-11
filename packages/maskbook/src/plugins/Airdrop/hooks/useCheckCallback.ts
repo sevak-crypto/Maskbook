@@ -109,7 +109,7 @@ export function useCheckCallback() {
                     start: start_,
                     end: end_,
                     claimable: available && new BigNumber(claimable).isGreaterThan(0) && !isEnd ? claimable : '0',
-                    ratio: new BigNumber(claimable).div(amount),
+                    ratio: new BigNumber(claimable).dividedBy(amount),
                 })
             } catch (error) {
                 if (error.message.includes('Already Claimed')) {

@@ -151,11 +151,11 @@ export function TradeForm(props: TradeFormProps) {
     const inputPanelLabel =
         loading && !isExactIn
             ? t('plugin_trader_finding_price')
-            : 'From' + (!isExactIn && inputTokenTradeAmount.gt(0) ? ' (estimated)' : '')
+            : 'From' + (!isExactIn && inputTokenTradeAmount.isGreaterThan(0) ? ' (estimated)' : '')
     const outputPanelLabel =
         loading && isExactIn
             ? t('plugin_trader_finding_price')
-            : 'To' + (isExactIn && outputTokenTradeAmount.gt(0) ? ' (estimated)' : '')
+            : 'To' + (isExactIn && outputTokenTradeAmount.isGreaterThan(0) ? ' (estimated)' : '')
     const sections = [
         {
             key: 'input',
@@ -220,7 +220,7 @@ export function TradeForm(props: TradeFormProps) {
         if (inputTokenTradeAmount.isZero() && outputTokenTradeAmount.isZero())
             return t('plugin_trader_error_amount_absence')
         if (!inputToken || !outputToken) return t('plugin_trader_error_amount_absence')
-        if (inputTokenBalanceAmount.lt(inputTokenTradeAmount))
+        if (inputTokenBalanceAmount.isLessThan(inputTokenTradeAmount))
             return t('plugin_trader_error_insufficient_balance', {
                 symbol: inputToken?.symbol,
             })

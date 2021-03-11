@@ -153,11 +153,11 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         const exchangeAmountsDivided = exchangeAmounts.map((x, i) => {
             const amount = new BigNumber(x)
             const divisor = gcd(ONE_TOKEN, amount)
-            return [amount.div(divisor), ONE_TOKEN.div(divisor)] as const
+            return [amount.dividedBy(divisor), ONE_TOKEN.dividedBy(divisor)] as const
         })
         const totalAmount = new BigNumber(total)
         const invalidTokenAt = exchangeAmountsDivided.findIndex(([tokenAmountA, tokenAmountB]) =>
-            totalAmount.multipliedBy(tokenAmountA).div(tokenAmountB).isZero(),
+            totalAmount.multipliedBy(tokenAmountA).dividedBy(tokenAmountB).isZero(),
         )
         if (invalidTokenAt >= 0) {
             setFillState({

@@ -26,17 +26,17 @@ export function useDonateCallback(address: string, amount: string, token?: Ether
 
     const donations = useMemo(() => {
         const tipAmount = new BigNumber(GITCOIN_TIP_PERCENTAGE / 100).multipliedBy(amount)
-        const grantAmount = new BigNumber(amount).sub(tipAmount)
+        const grantAmount = new BigNumber(amount).minus(tipAmount)
         if (!address || !token) return []
         return [
             {
                 token: token.type === EthereumTokenType.Ether ? GITCOIN_ETH_ADDRESS : token.address,
-                amount: tipAmount.toString(),
+                amount: tipAmount.toFixed(),
                 dest: address,
             },
             {
                 token: token.type === EthereumTokenType.Ether ? GITCOIN_ETH_ADDRESS : token.address,
-                amount: grantAmount.toString(),
+                amount: grantAmount.toFixed(),
                 dest: address,
             },
         ]
@@ -59,7 +59,7 @@ export function useDonateCallback(address: string, amount: string, token?: Ether
         const config: TransactionRequest = {
             from: account,
             to: bulkCheckoutContract.options.address,
-            value: new BigNumber(token.type === EthereumTokenType.Ether ? amount : 0).toString(),
+            value: new BigNumber(token.type === EthereumTokenType.Ether ? amount : 0).toFixed(),
         }
         const estimatedGas = await bulkCheckoutContract.estimateGas.donate(donations).catch((error) => {
             setDonateState({

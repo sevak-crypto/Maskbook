@@ -70,7 +70,7 @@ export function useAssetsDetailedDebank() {
             },
             value: {
                 [CurrencyType.USD]: new BigNumber(x.price)
-                    .multipliedBy(new BigNumber(x.balance).div(new BigNumber(10).pow(x.decimals)))
+                    .multipliedBy(new BigNumber(x.balance).dividedBy(new BigNumber(10).pow(x.decimals)))
                     .toString(),
             },
             logoURL: x.logo_url,

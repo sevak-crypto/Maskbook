@@ -17,7 +17,7 @@ export const renderWithITO_Metadata = createRenderWithMetadata(ITO_MetadataReade
 export function gcd(a: BigNumber, b: BigNumber) {
     let a_ = a.abs()
     let b_ = b.abs()
-    if (b_.gt(a_)) {
+    if (b_.isGreaterThan(a_)) {
         const temp = b_
         b_ = a_
         a_ = temp

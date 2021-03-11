@@ -26,7 +26,7 @@ export function isETH(address: string) {
 }
 
 export function addGasMargin(value: BigNumber, scale = 1000) {
-    return value.multipliedBy(new BigNumber(10000).plus(new BigNumber(scale))).div(new BigNumber(10000))
+    return value.multipliedBy(new BigNumber(10000).plus(new BigNumber(scale))).dividedBy(new BigNumber(10000))
 }
 
 //#region constants

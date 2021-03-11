@@ -71,7 +71,7 @@ export async function getSwaps(tokenIn: string, tokenOut: string, swapType: BALA
     const pools = sor.onChainCache.pools
     const routes = swaps.map((rawHops) => {
         const swapAmount = new BigNumber(rawHops[0].swapAmount || '0')
-        const share = swapAmount.div(totalSwapAmount).toNumber()
+        const share = swapAmount.dividedBy(totalSwapAmount).toNumber()
         const hops = rawHops.map((rawHop) => {
             const { swapAmount } = rawHop
             const tokenIn = rawHop.tokenIn
@@ -85,7 +85,7 @@ export async function getSwaps(tokenIn: string, tokenOut: string, swapType: BALA
                     .map((token) => {
                         const address = token.address
                         const weight = new BigNumber(token.denormWeight)
-                        const share = weight.div(totalWeight).toNumber()
+                        const share = weight.dividedBy(totalWeight).toNumber()
                         return {
                             address,
                             share,

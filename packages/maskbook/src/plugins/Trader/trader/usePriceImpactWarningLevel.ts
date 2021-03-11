@@ -5,10 +5,10 @@ import { WarningLevel } from '../types'
 
 export function usePriceImpactWarningLevel(priceImpact: BigNumber) {
     return useMemo(() => {
-        if (priceImpact.gt(WarningLevel.BLOCKED)) return WarningLevel.BLOCKED
-        if (priceImpact.gt(PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN)) return WarningLevel.CONFIRMATION_REQUIRED
-        if (priceImpact.gt(PRICE_IMPACT_HIGH)) return WarningLevel.HIGH
-        if (priceImpact.gt(PRICE_IMPACT_MEDIUM)) return WarningLevel.MEDIUM
+        if (priceImpact.isGreaterThan(WarningLevel.BLOCKED)) return WarningLevel.BLOCKED
+        if (priceImpact.isGreaterThan(PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN)) return WarningLevel.CONFIRMATION_REQUIRED
+        if (priceImpact.isGreaterThan(PRICE_IMPACT_HIGH)) return WarningLevel.HIGH
+        if (priceImpact.isGreaterThan(PRICE_IMPACT_MEDIUM)) return WarningLevel.MEDIUM
         return WarningLevel.LOW
     }, [priceImpact.toString()])
 }

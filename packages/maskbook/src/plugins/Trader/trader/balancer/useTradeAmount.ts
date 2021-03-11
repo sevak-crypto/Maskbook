@@ -10,7 +10,9 @@ export function useTradeAmount(
     return useMemo(() => {
         if (!trade) return new BigNumber(0)
         return trade.strategy === TradeStrategy.ExactIn
-            ? trade.outputAmount.div(ONE_BIPS.multipliedBy(allowedSlippage).add(1)).integerValue(BigNumber.ROUND_DOWN)
+            ? trade.outputAmount
+                  .dividedBy(ONE_BIPS.multipliedBy(allowedSlippage).add(1))
+                  .integerValue(BigNumber.ROUND_DOWN)
             : trade.inputAmount.multipliedBy(
                   ONE_BIPS.multipliedBy(allowedSlippage).add(1).integerValue(BigNumber.ROUND_DOWN),
               )

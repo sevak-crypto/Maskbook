@@ -116,7 +116,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
                 to use your {token.symbol ?? 'Token'} tokens when a new ITO round starts later.
             </Typography>
             <EthereumWalletConnectedBoundary>
-                <EthereumERC20TokenApprovedBoundary amount={amount.toString()} spender={recipientAddress} token={token}>
+                <EthereumERC20TokenApprovedBoundary amount={amount.toFixed()} spender={recipientAddress} token={token}>
                     {(allowance: string) => (
                         <ActionButton className={classes.button} size="large" fullWidth disabled variant="contained">
                             {isMoreThanMillion(allowance, token.decimals)

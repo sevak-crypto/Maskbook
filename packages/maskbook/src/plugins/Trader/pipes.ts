@@ -106,11 +106,11 @@ export function resolveDaysName(days: number) {
 
 export function resolveUniswapWarningLevel(priceImpact: BigNumber) {
     const priceImpact_ = priceImpact.multipliedBy(BIPS_BASE)
-    if (priceImpact_.gt(PRICE_IMPACT_NON_EXPERT_BLOCKED)) return WarningLevel.BLOCKED
-    if (priceImpact_.gt(PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN)) return WarningLevel.CONFIRMATION_REQUIRED
-    if (priceImpact_.gt(PRICE_IMPACT_HIGH)) return WarningLevel.HIGH
-    if (priceImpact_.gt(PRICE_IMPACT_MEDIUM)) return WarningLevel.MEDIUM
-    if (priceImpact_.gt(PRICE_IMPACT_LOW)) return WarningLevel.LOW
+    if (priceImpact_.isGreaterThan(PRICE_IMPACT_NON_EXPERT_BLOCKED)) return WarningLevel.BLOCKED
+    if (priceImpact_.isGreaterThan(PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN)) return WarningLevel.CONFIRMATION_REQUIRED
+    if (priceImpact_.isGreaterThan(PRICE_IMPACT_HIGH)) return WarningLevel.HIGH
+    if (priceImpact_.isGreaterThan(PRICE_IMPACT_MEDIUM)) return WarningLevel.MEDIUM
+    if (priceImpact_.isGreaterThan(PRICE_IMPACT_LOW)) return WarningLevel.LOW
     return
 }
 

@@ -37,7 +37,7 @@ export function useCreateCallback(redPacketSettings: RedPacketSettings) {
         }
 
         // error handling
-        if (new BigNumber(total).lt(shares)) {
+        if (new BigNumber(total).isLessThan(shares)) {
             setCreateState({
                 type: TransactionStateType.FAILED,
                 error: new Error('At least [number of red packets] tokens to your red packet.'),

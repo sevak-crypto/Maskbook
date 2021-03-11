@@ -89,7 +89,7 @@ export function TradeSummary(props: TradeSummaryProps) {
     const isExactIn = strategy === TradeStrategy.ExactIn
 
     const records: SummaryRecord[] = [
-        inputAmount.gt(0) && outputAmount.gt(0)
+        inputAmount.isGreaterThan(0) && outputAmount.isGreaterThan(0)
             ? {
                   title: 'Price',
                   children: (
@@ -99,7 +99,7 @@ export function TradeSummary(props: TradeSummaryProps) {
                                   <strong className={classes.emphasis}>
                                       {formatBalance(
                                           outputAmount
-                                              .div(inputAmount)
+                                              .dividedBy(inputAmount)
                                               .multipliedBy(
                                                   new BigNumber(10).pow(inputToken.decimals - outputToken.decimals),
                                               )
@@ -118,7 +118,7 @@ export function TradeSummary(props: TradeSummaryProps) {
                                   <strong className={classes.emphasis}>
                                       {formatBalance(
                                           inputAmount
-                                              .div(outputAmount)
+                                              .dividedBy(outputAmount)
                                               .multipliedBy(
                                                   new BigNumber(10).pow(outputToken.decimals - inputToken.decimals),
                                               )
@@ -181,8 +181,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                     style={{
                         color: resolveUniswapWarningLevelColor(resolveUniswapWarningLevel(priceImpactWithoutFee)),
                     }}>
-                    {priceImpactWithoutFee.gt(0)
-                        ? priceImpactWithoutFee?.lt(ONE_BIPS)
+                    {priceImpactWithoutFee.isGreaterThan(0)
+                        ? priceImpactWithoutFee?.isLessThan(ONE_BIPS)
                             ? '<0.01%'
                             : `${formatPercentage(priceImpactWithoutFee)}`
                         : '-'}
@@ -208,8 +208,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                     style={{
                         color: resolveUniswapWarningLevelColor(resolveUniswapWarningLevel(priceImpact)),
                     }}>
-                    {priceImpact.gt(0)
-                        ? priceImpact?.lt(ONE_BIPS)
+                    {priceImpact.isGreaterThan(0)
+                        ? priceImpact?.isLessThan(ONE_BIPS)
                             ? '<0.01%'
                             : `${formatPercentage(priceImpact)}`
                         : '-'}

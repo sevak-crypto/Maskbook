@@ -226,7 +226,7 @@ export function ITO(props: ITO_Props) {
 
     const total = new BigNumber(payload_total)
     const total_remaining = new BigNumber(payload_total_remaining)
-    const sold = total.sub(total_remaining)
+    const sold = total.minus(total_remaining)
 
     //#region token detailed
     const {
@@ -272,7 +272,7 @@ export function ITO(props: ITO_Props) {
     const refundAmount = useMemo(
         () =>
             tradeInfo?.buyInfo
-                ? new BigNumber(tradeInfo?.buyInfo.amount).sub(new BigNumber(tradeInfo?.buyInfo.amount_sold))
+                ? new BigNumber(tradeInfo?.buyInfo.amount).minus(new BigNumber(tradeInfo?.buyInfo.amount_sold))
                 : new BigNumber(0),
         [tradeInfo],
     )
@@ -384,7 +384,7 @@ export function ITO(props: ITO_Props) {
             symbol: token.symbol,
         })
 
-        if (refundAmount.isZero() || refundAmount.lt(0)) {
+        if (refundAmount.isZero() || refundAmount.isLessThan(0)) {
             return `${_text}.`
         }
 
@@ -481,7 +481,10 @@ export function ITO(props: ITO_Props) {
                     </Link>
                 </Typography>
                 <Box className={classes.progressWrap}>
-                    <StyledLinearProgress variant="determinate" value={Number(sold.multipliedBy(100).div(total))} />
+                    <StyledLinearProgress
+                        variant="determinate"
+                        value={Number(sold.multipliedBy(100).dividedBy(total))}
+                    />
                 </Box>
                 <Box>
                     {exchange_tokens
@@ -492,7 +495,7 @@ export function ITO(props: ITO_Props) {
                                 <TokenItem
                                     price={formatBalance(
                                         new BigNumber(exchange_amounts[i * 2])
-                                            .div(new BigNumber(exchange_amounts[i * 2 + 1]))
+                                            .dividedBy(new BigNumber(exchange_amounts[i * 2 + 1]))
                                             .multipliedBy(
                                                 new BigNumber(10).pow(token.decimals - exchange_tokens[i].decimals),
                                             )
