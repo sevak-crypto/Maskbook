@@ -9,71 +9,71 @@ import { Listener, Provider } from '@ethersproject/providers'
 import { FunctionFragment, EventFragment, Result } from '@ethersproject/abi'
 import { TypedEventFilter, TypedEvent, TypedListener } from './commons'
 
-interface ElectionTokenInterface extends ethers.utils.Interface {
+interface COTMTokenInterface extends ethers.utils.Interface {
     functions: {
         'approve(address,uint256)': FunctionFragment
-        'mintStateToken(address,uint8)': FunctionFragment
-        'modify_admin(address,bool)': FunctionFragment
-        'modify_limits(uint8,int8)': FunctionFragment
-        'safeTransferFrom(address,address,uint256)': FunctionFragment
-        'setApprovalForAll(address,bool)': FunctionFragment
-        'transferFrom(address,address,uint256)': FunctionFragment
         'balanceOf(address)': FunctionFragment
         'baseURI()': FunctionFragment
-        'check_availability(uint8)': FunctionFragment
+        'check_availability()': FunctionFragment
         'getApproved(uint256)': FunctionFragment
         'isApprovedForAll(address,address)': FunctionFragment
+        'mintToken(address)': FunctionFragment
+        'modify_admin(address,bool)': FunctionFragment
+        'modify_limit(int8)': FunctionFragment
         'name()': FunctionFragment
         'ownerOf(uint256)': FunctionFragment
+        'safeTransferFrom(address,address,uint256)': FunctionFragment
+        'setApprovalForAll(address,bool)': FunctionFragment
         'supportsInterface(bytes4)': FunctionFragment
         'symbol()': FunctionFragment
         'tokenByIndex(uint256)': FunctionFragment
         'tokenOfOwnerByIndex(address,uint256)': FunctionFragment
         'tokenURI(uint256)': FunctionFragment
         'totalSupply()': FunctionFragment
+        'transferFrom(address,address,uint256)': FunctionFragment
     }
 
     encodeFunctionData(functionFragment: 'approve', values: [string, BigNumberish]): string
-    encodeFunctionData(functionFragment: 'mintStateToken', values: [string, BigNumberish]): string
-    encodeFunctionData(functionFragment: 'modify_admin', values: [string, boolean]): string
-    encodeFunctionData(functionFragment: 'modify_limits', values: [BigNumberish, BigNumberish]): string
-    encodeFunctionData(functionFragment: 'safeTransferFrom', values: [string, string, BigNumberish]): string
-    encodeFunctionData(functionFragment: 'setApprovalForAll', values: [string, boolean]): string
-    encodeFunctionData(functionFragment: 'transferFrom', values: [string, string, BigNumberish]): string
     encodeFunctionData(functionFragment: 'balanceOf', values: [string]): string
     encodeFunctionData(functionFragment: 'baseURI', values?: undefined): string
-    encodeFunctionData(functionFragment: 'check_availability', values: [BigNumberish]): string
+    encodeFunctionData(functionFragment: 'check_availability', values?: undefined): string
     encodeFunctionData(functionFragment: 'getApproved', values: [BigNumberish]): string
     encodeFunctionData(functionFragment: 'isApprovedForAll', values: [string, string]): string
+    encodeFunctionData(functionFragment: 'mintToken', values: [string]): string
+    encodeFunctionData(functionFragment: 'modify_admin', values: [string, boolean]): string
+    encodeFunctionData(functionFragment: 'modify_limit', values: [BigNumberish]): string
     encodeFunctionData(functionFragment: 'name', values?: undefined): string
     encodeFunctionData(functionFragment: 'ownerOf', values: [BigNumberish]): string
+    encodeFunctionData(functionFragment: 'safeTransferFrom', values: [string, string, BigNumberish]): string
+    encodeFunctionData(functionFragment: 'setApprovalForAll', values: [string, boolean]): string
     encodeFunctionData(functionFragment: 'supportsInterface', values: [BytesLike]): string
     encodeFunctionData(functionFragment: 'symbol', values?: undefined): string
     encodeFunctionData(functionFragment: 'tokenByIndex', values: [BigNumberish]): string
     encodeFunctionData(functionFragment: 'tokenOfOwnerByIndex', values: [string, BigNumberish]): string
     encodeFunctionData(functionFragment: 'tokenURI', values: [BigNumberish]): string
     encodeFunctionData(functionFragment: 'totalSupply', values?: undefined): string
+    encodeFunctionData(functionFragment: 'transferFrom', values: [string, string, BigNumberish]): string
 
     decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'mintStateToken', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'modify_admin', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'modify_limits', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'safeTransferFrom', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'setApprovalForAll', data: BytesLike): Result
-    decodeFunctionResult(functionFragment: 'transferFrom', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'balanceOf', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'baseURI', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'check_availability', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'getApproved', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'isApprovedForAll', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'mintToken', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'modify_admin', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'modify_limit', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'name', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'ownerOf', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'safeTransferFrom', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'setApprovalForAll', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'supportsInterface', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'symbol', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'tokenByIndex', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'tokenOfOwnerByIndex', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'tokenURI', data: BytesLike): Result
     decodeFunctionResult(functionFragment: 'totalSupply', data: BytesLike): Result
+    decodeFunctionResult(functionFragment: 'transferFrom', data: BytesLike): Result
 
     events: {
         'Approval(address,address,uint256)': EventFragment
@@ -86,7 +86,7 @@ interface ElectionTokenInterface extends ethers.utils.Interface {
     getEvent(nameOrSignatureOrTopic: 'Transfer'): EventFragment
 }
 
-export class ElectionToken extends Contract {
+export class COTMToken extends Contract {
     connect(signerOrProvider: Signer | Provider | string): this
     attach(addressOrName: string): this
     deployed(): Promise<this>
@@ -127,7 +127,7 @@ export class ElectionToken extends Contract {
         toBlock?: string | number | undefined,
     ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-    interface: ElectionTokenInterface
+    interface: COTMTokenInterface
 
     functions: {
         approve(to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
@@ -138,13 +138,33 @@ export class ElectionToken extends Contract {
             overrides?: Overrides,
         ): Promise<ContractTransaction>
 
-        mintStateToken(claimer: string, state: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+        balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>
 
-        'mintStateToken(address,uint8)'(
-            claimer: string,
-            state: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<ContractTransaction>
+        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>
+
+        baseURI(overrides?: CallOverrides): Promise<[string]>
+
+        'baseURI()'(overrides?: CallOverrides): Promise<[string]>
+
+        check_availability(overrides?: CallOverrides): Promise<[number]>
+
+        'check_availability()'(overrides?: CallOverrides): Promise<[number]>
+
+        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
+
+        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
+
+        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<[boolean]>
+
+        'isApprovedForAll(address,address)'(
+            owner: string,
+            operator: string,
+            overrides?: CallOverrides,
+        ): Promise<[boolean]>
+
+        mintToken(claimer: string, overrides?: Overrides): Promise<ContractTransaction>
+
+        'mintToken(address)'(claimer: string, overrides?: Overrides): Promise<ContractTransaction>
 
         modify_admin(target: string, ifadmin: boolean, overrides?: Overrides): Promise<ContractTransaction>
 
@@ -154,13 +174,17 @@ export class ElectionToken extends Contract {
             overrides?: Overrides,
         ): Promise<ContractTransaction>
 
-        modify_limits(state: BigNumberish, delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+        modify_limit(delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
 
-        'modify_limits(uint8,int8)'(
-            state: BigNumberish,
-            delta: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<ContractTransaction>
+        'modify_limit(int8)'(delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+
+        name(overrides?: CallOverrides): Promise<[string]>
+
+        'name()'(overrides?: CallOverrides): Promise<[string]>
+
+        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
+
+        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
 
         'safeTransferFrom(address,address,uint256)'(
             from: string,
@@ -184,52 +208,6 @@ export class ElectionToken extends Contract {
             approved: boolean,
             overrides?: Overrides,
         ): Promise<ContractTransaction>
-
-        transferFrom(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<ContractTransaction>
-
-        'transferFrom(address,address,uint256)'(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<ContractTransaction>
-
-        balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>
-
-        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>
-
-        baseURI(overrides?: CallOverrides): Promise<[string]>
-
-        'baseURI()'(overrides?: CallOverrides): Promise<[string]>
-
-        check_availability(state: BigNumberish, overrides?: CallOverrides): Promise<[number]>
-
-        'check_availability(uint8)'(state: BigNumberish, overrides?: CallOverrides): Promise<[number]>
-
-        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
-
-        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
-
-        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<[boolean]>
-
-        'isApprovedForAll(address,address)'(
-            owner: string,
-            operator: string,
-            overrides?: CallOverrides,
-        ): Promise<[boolean]>
-
-        name(overrides?: CallOverrides): Promise<[string]>
-
-        'name()'(overrides?: CallOverrides): Promise<[string]>
-
-        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
-
-        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>
 
         supportsInterface(interfaceId: BytesLike, overrides?: CallOverrides): Promise<[boolean]>
 
@@ -258,31 +236,65 @@ export class ElectionToken extends Contract {
         totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>
 
         'totalSupply()'(overrides?: CallOverrides): Promise<[BigNumber]>
+
+        transferFrom(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: Overrides,
+        ): Promise<ContractTransaction>
+
+        'transferFrom(address,address,uint256)'(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: Overrides,
+        ): Promise<ContractTransaction>
     }
 
     approve(to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
 
     'approve(address,uint256)'(to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
 
-    mintStateToken(claimer: string, state: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
 
-    'mintStateToken(address,uint8)'(
-        claimer: string,
-        state: BigNumberish,
-        overrides?: Overrides,
-    ): Promise<ContractTransaction>
+    'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
+
+    baseURI(overrides?: CallOverrides): Promise<string>
+
+    'baseURI()'(overrides?: CallOverrides): Promise<string>
+
+    check_availability(overrides?: CallOverrides): Promise<number>
+
+    'check_availability()'(overrides?: CallOverrides): Promise<number>
+
+    getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+    'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+    isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
+
+    'isApprovedForAll(address,address)'(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
+
+    mintToken(claimer: string, overrides?: Overrides): Promise<ContractTransaction>
+
+    'mintToken(address)'(claimer: string, overrides?: Overrides): Promise<ContractTransaction>
 
     modify_admin(target: string, ifadmin: boolean, overrides?: Overrides): Promise<ContractTransaction>
 
     'modify_admin(address,bool)'(target: string, ifadmin: boolean, overrides?: Overrides): Promise<ContractTransaction>
 
-    modify_limits(state: BigNumberish, delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+    modify_limit(delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
 
-    'modify_limits(uint8,int8)'(
-        state: BigNumberish,
-        delta: BigNumberish,
-        overrides?: Overrides,
-    ): Promise<ContractTransaction>
+    'modify_limit(int8)'(delta: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+
+    name(overrides?: CallOverrides): Promise<string>
+
+    'name()'(overrides?: CallOverrides): Promise<string>
+
+    ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+    'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
 
     'safeTransferFrom(address,address,uint256)'(
         from: string,
@@ -306,43 +318,6 @@ export class ElectionToken extends Contract {
         approved: boolean,
         overrides?: Overrides,
     ): Promise<ContractTransaction>
-
-    transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
-
-    'transferFrom(address,address,uint256)'(
-        from: string,
-        to: string,
-        tokenId: BigNumberish,
-        overrides?: Overrides,
-    ): Promise<ContractTransaction>
-
-    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-    'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-    baseURI(overrides?: CallOverrides): Promise<string>
-
-    'baseURI()'(overrides?: CallOverrides): Promise<string>
-
-    check_availability(state: BigNumberish, overrides?: CallOverrides): Promise<number>
-
-    'check_availability(uint8)'(state: BigNumberish, overrides?: CallOverrides): Promise<number>
-
-    getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-    'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-    isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
-
-    'isApprovedForAll(address,address)'(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
-
-    name(overrides?: CallOverrides): Promise<string>
-
-    'name()'(overrides?: CallOverrides): Promise<string>
-
-    ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-    'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
 
     supportsInterface(interfaceId: BytesLike, overrides?: CallOverrides): Promise<boolean>
 
@@ -372,26 +347,63 @@ export class ElectionToken extends Contract {
 
     'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>
 
+    transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<ContractTransaction>
+
+    'transferFrom(address,address,uint256)'(
+        from: string,
+        to: string,
+        tokenId: BigNumberish,
+        overrides?: Overrides,
+    ): Promise<ContractTransaction>
+
     callStatic: {
         approve(to: string, tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>
 
         'approve(address,uint256)'(to: string, tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-        mintStateToken(claimer: string, state: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
+        balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
 
-        'mintStateToken(address,uint8)'(
-            claimer: string,
-            state: BigNumberish,
+        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
+
+        baseURI(overrides?: CallOverrides): Promise<string>
+
+        'baseURI()'(overrides?: CallOverrides): Promise<string>
+
+        check_availability(overrides?: CallOverrides): Promise<number>
+
+        'check_availability()'(overrides?: CallOverrides): Promise<number>
+
+        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
+
+        'isApprovedForAll(address,address)'(
+            owner: string,
+            operator: string,
             overrides?: CallOverrides,
-        ): Promise<BigNumber>
+        ): Promise<boolean>
+
+        mintToken(claimer: string, overrides?: CallOverrides): Promise<BigNumber>
+
+        'mintToken(address)'(claimer: string, overrides?: CallOverrides): Promise<BigNumber>
 
         modify_admin(target: string, ifadmin: boolean, overrides?: CallOverrides): Promise<void>
 
         'modify_admin(address,bool)'(target: string, ifadmin: boolean, overrides?: CallOverrides): Promise<void>
 
-        modify_limits(state: BigNumberish, delta: BigNumberish, overrides?: CallOverrides): Promise<void>
+        modify_limit(delta: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-        'modify_limits(uint8,int8)'(state: BigNumberish, delta: BigNumberish, overrides?: CallOverrides): Promise<void>
+        'modify_limit(int8)'(delta: BigNumberish, overrides?: CallOverrides): Promise<void>
+
+        name(overrides?: CallOverrides): Promise<string>
+
+        'name()'(overrides?: CallOverrides): Promise<string>
+
+        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
+
+        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
 
         'safeTransferFrom(address,address,uint256)'(
             from: string,
@@ -411,47 +423,6 @@ export class ElectionToken extends Contract {
         setApprovalForAll(operator: string, approved: boolean, overrides?: CallOverrides): Promise<void>
 
         'setApprovalForAll(address,bool)'(operator: string, approved: boolean, overrides?: CallOverrides): Promise<void>
-
-        transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>
-
-        'transferFrom(address,address,uint256)'(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: CallOverrides,
-        ): Promise<void>
-
-        balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-        baseURI(overrides?: CallOverrides): Promise<string>
-
-        'baseURI()'(overrides?: CallOverrides): Promise<string>
-
-        check_availability(state: BigNumberish, overrides?: CallOverrides): Promise<number>
-
-        'check_availability(uint8)'(state: BigNumberish, overrides?: CallOverrides): Promise<number>
-
-        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<boolean>
-
-        'isApprovedForAll(address,address)'(
-            owner: string,
-            operator: string,
-            overrides?: CallOverrides,
-        ): Promise<boolean>
-
-        name(overrides?: CallOverrides): Promise<string>
-
-        'name()'(overrides?: CallOverrides): Promise<string>
-
-        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
-
-        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>
 
         supportsInterface(interfaceId: BytesLike, overrides?: CallOverrides): Promise<boolean>
 
@@ -480,6 +451,15 @@ export class ElectionToken extends Contract {
         totalSupply(overrides?: CallOverrides): Promise<BigNumber>
 
         'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>
+
+        transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>
+
+        'transferFrom(address,address,uint256)'(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: CallOverrides,
+        ): Promise<void>
     }
 
     filters: {
@@ -507,17 +487,49 @@ export class ElectionToken extends Contract {
 
         'approve(address,uint256)'(to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<BigNumber>
 
-        mintStateToken(claimer: string, state: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+        balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
 
-        'mintStateToken(address,uint8)'(claimer: string, state: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
+
+        baseURI(overrides?: CallOverrides): Promise<BigNumber>
+
+        'baseURI()'(overrides?: CallOverrides): Promise<BigNumber>
+
+        check_availability(overrides?: CallOverrides): Promise<BigNumber>
+
+        'check_availability()'(overrides?: CallOverrides): Promise<BigNumber>
+
+        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
+
+        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
+
+        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<BigNumber>
+
+        'isApprovedForAll(address,address)'(
+            owner: string,
+            operator: string,
+            overrides?: CallOverrides,
+        ): Promise<BigNumber>
+
+        mintToken(claimer: string, overrides?: Overrides): Promise<BigNumber>
+
+        'mintToken(address)'(claimer: string, overrides?: Overrides): Promise<BigNumber>
 
         modify_admin(target: string, ifadmin: boolean, overrides?: Overrides): Promise<BigNumber>
 
         'modify_admin(address,bool)'(target: string, ifadmin: boolean, overrides?: Overrides): Promise<BigNumber>
 
-        modify_limits(state: BigNumberish, delta: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+        modify_limit(delta: BigNumberish, overrides?: Overrides): Promise<BigNumber>
 
-        'modify_limits(uint8,int8)'(state: BigNumberish, delta: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+        'modify_limit(int8)'(delta: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+
+        name(overrides?: CallOverrides): Promise<BigNumber>
+
+        'name()'(overrides?: CallOverrides): Promise<BigNumber>
+
+        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
+
+        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
 
         'safeTransferFrom(address,address,uint256)'(
             from: string,
@@ -541,47 +553,6 @@ export class ElectionToken extends Contract {
             approved: boolean,
             overrides?: Overrides,
         ): Promise<BigNumber>
-
-        transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<BigNumber>
-
-        'transferFrom(address,address,uint256)'(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<BigNumber>
-
-        balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<BigNumber>
-
-        baseURI(overrides?: CallOverrides): Promise<BigNumber>
-
-        'baseURI()'(overrides?: CallOverrides): Promise<BigNumber>
-
-        check_availability(state: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
-
-        'check_availability(uint8)'(state: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
-
-        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
-
-        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
-
-        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<BigNumber>
-
-        'isApprovedForAll(address,address)'(
-            owner: string,
-            operator: string,
-            overrides?: CallOverrides,
-        ): Promise<BigNumber>
-
-        name(overrides?: CallOverrides): Promise<BigNumber>
-
-        'name()'(overrides?: CallOverrides): Promise<BigNumber>
-
-        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
-
-        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
 
         supportsInterface(interfaceId: BytesLike, overrides?: CallOverrides): Promise<BigNumber>
 
@@ -610,6 +581,15 @@ export class ElectionToken extends Contract {
         totalSupply(overrides?: CallOverrides): Promise<BigNumber>
 
         'totalSupply()'(overrides?: CallOverrides): Promise<BigNumber>
+
+        transferFrom(from: string, to: string, tokenId: BigNumberish, overrides?: Overrides): Promise<BigNumber>
+
+        'transferFrom(address,address,uint256)'(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: Overrides,
+        ): Promise<BigNumber>
     }
 
     populateTransaction: {
@@ -621,13 +601,33 @@ export class ElectionToken extends Contract {
             overrides?: Overrides,
         ): Promise<PopulatedTransaction>
 
-        mintStateToken(claimer: string, state: BigNumberish, overrides?: Overrides): Promise<PopulatedTransaction>
+        balanceOf(owner: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-        'mintStateToken(address,uint8)'(
-            claimer: string,
-            state: BigNumberish,
-            overrides?: Overrides,
+        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'baseURI()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        check_availability(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'check_availability()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'isApprovedForAll(address,address)'(
+            owner: string,
+            operator: string,
+            overrides?: CallOverrides,
         ): Promise<PopulatedTransaction>
+
+        mintToken(claimer: string, overrides?: Overrides): Promise<PopulatedTransaction>
+
+        'mintToken(address)'(claimer: string, overrides?: Overrides): Promise<PopulatedTransaction>
 
         modify_admin(target: string, ifadmin: boolean, overrides?: Overrides): Promise<PopulatedTransaction>
 
@@ -637,13 +637,17 @@ export class ElectionToken extends Contract {
             overrides?: Overrides,
         ): Promise<PopulatedTransaction>
 
-        modify_limits(state: BigNumberish, delta: BigNumberish, overrides?: Overrides): Promise<PopulatedTransaction>
+        modify_limit(delta: BigNumberish, overrides?: Overrides): Promise<PopulatedTransaction>
 
-        'modify_limits(uint8,int8)'(
-            state: BigNumberish,
-            delta: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<PopulatedTransaction>
+        'modify_limit(int8)'(delta: BigNumberish, overrides?: Overrides): Promise<PopulatedTransaction>
+
+        name(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
         'safeTransferFrom(address,address,uint256)'(
             from: string,
@@ -667,52 +671,6 @@ export class ElectionToken extends Contract {
             approved: boolean,
             overrides?: Overrides,
         ): Promise<PopulatedTransaction>
-
-        transferFrom(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<PopulatedTransaction>
-
-        'transferFrom(address,address,uint256)'(
-            from: string,
-            to: string,
-            tokenId: BigNumberish,
-            overrides?: Overrides,
-        ): Promise<PopulatedTransaction>
-
-        balanceOf(owner: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'balanceOf(address)'(owner: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'baseURI()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        check_availability(state: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'check_availability(uint8)'(state: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        getApproved(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'getApproved(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        isApprovedForAll(owner: string, operator: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'isApprovedForAll(address,address)'(
-            owner: string,
-            operator: string,
-            overrides?: CallOverrides,
-        ): Promise<PopulatedTransaction>
-
-        name(overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'name()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
-
-        'ownerOf(uint256)'(tokenId: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
         supportsInterface(interfaceId: BytesLike, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
@@ -745,5 +703,19 @@ export class ElectionToken extends Contract {
         totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
         'totalSupply()'(overrides?: CallOverrides): Promise<PopulatedTransaction>
+
+        transferFrom(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: Overrides,
+        ): Promise<PopulatedTransaction>
+
+        'transferFrom(address,address,uint256)'(
+            from: string,
+            to: string,
+            tokenId: BigNumberish,
+            overrides?: Overrides,
+        ): Promise<PopulatedTransaction>
     }
 }
