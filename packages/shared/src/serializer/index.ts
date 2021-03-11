@@ -1,5 +1,5 @@
 /// <reference path="./typeson.d.ts" />
-import BigNumber from 'bignumber.js'
+import { BigNumber } from 'ethers'
 import Typeson from 'typeson'
 import type { Serialization } from 'async-call-rpc'
 import { Ok, Err } from 'ts-results'

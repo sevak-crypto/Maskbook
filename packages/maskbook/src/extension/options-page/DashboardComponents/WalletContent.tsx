@@ -23,6 +23,7 @@ import { WalletAssetsTable } from './WalletAssetsTable'
 import { PluginTransakMessages } from '../../../plugins/Transak/messages'
 import { Flags } from '../../../utils/flags'
 import { useChainIdValid } from '../../../web3/hooks/useChainState'
+import { useRemoteControlledDialog } from '../../../utils/hooks/useRemoteControlledDialog'
 
 const useStyles = makeStyles((theme) =>
     createStyles({

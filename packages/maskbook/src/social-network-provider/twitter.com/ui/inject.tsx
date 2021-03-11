@@ -1,3 +1,4 @@
+import { noop } from 'lodash-es'
 import type { SocialNetworkUIInjections } from '../../../social-network/ui'
 import { injectPostDialogAtTwitter } from './injectPostDialog'
 import { injectSetupPromptAtTwitter } from './injectSetupPrompt'
@@ -7,7 +8,7 @@ import { injectPostDialogIconAtTwitter } from './injectPostDialogIcon'
 import { injectPostReplacerAtTwitter } from './injectPostReplacer'
 import { injectPageInspectorDefault } from '../../../social-network/defaults/injectPageInspector'
 // import { injectSearchResultBoxAtTwitter } from './injectSearchResultBox'
-import { injectToolbarAtTwitter } from './injectToolbar'
+// import { injectToolbarAtTwitter } from './injectToolbar'
 
 const injectPostBox = () => {
     injectPostDialogAtTwitter()
@@ -17,7 +18,8 @@ const injectPostBox = () => {
 
 export const twitterUIInjections: SocialNetworkUIInjections = {
     injectPostBox,
-    injectToolbar: injectToolbarAtTwitter,
+    injectToolbar: noop,
+    // injectToolbar: injectToolbarAtTwitter,
     injectSetupPrompt: injectSetupPromptAtTwitter,
     // injectSearchResultBox: injectSearchResultBoxAtTwitter,
     injectPostReplacer: injectPostReplacerAtTwitter,

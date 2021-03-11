@@ -1,6 +1,6 @@
-import { createStyles, Grid, makeStyles } from '@material-ui/core'
-import BigNumber from 'bignumber.js'
 import { useCallback } from 'react'
+import { BigNumber } from 'ethers'
+import { createStyles, Grid, makeStyles } from '@material-ui/core'
 import ActionButton from '../../extension/options-page/DashboardComponents/ActionButton'
 import { WalletMessages } from '../../plugins/Wallet/messages'
 import { useRemoteControlledDialog } from '../../utils/hooks/useRemoteControlledDialog'
@@ -29,9 +29,11 @@ export function EthereumWalletConnectedBoundary(props: EthereumWalletConnectedBo
 
     const account = useAccount()
     const chainIdValid = useChainIdValid()
-    const { value: etherBalance = '0', error: etherBalanceError, retry: retryEtherBalance } = useEtherTokenBalance(
-        account,
-    )
+    const {
+        value: etherBalance = BigNumber.from(0),
+        error: etherBalanceError,
+        retry: retryEtherBalance,
+    } = useEtherTokenBalance(account)
 
     //#region remote controlled select provider dialog
     const [, setSelectProviderDialogOpen] = useRemoteControlledDialog(WalletMessages.events.selectProviderDialogUpdated)
@@ -50,7 +52,7 @@ export function EthereumWalletConnectedBoundary(props: EthereumWalletConnectedBo
                 </ActionButton>
             </Grid>
         )
-    if (new BigNumber(etherBalance).isZero())
+    if (etherBalance.isZero())
         return (
             <Grid container>
                 <ActionButton

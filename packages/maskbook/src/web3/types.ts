@@ -130,19 +130,19 @@ export enum StageType {
 
 export type Stage =
     | {
-        type: StageType.TRANSACTION_HASH
-        hash: string
-    }
+          type: StageType.TRANSACTION_HASH
+          hash: string
+      }
     | {
-        type: StageType.RECEIPT
-        receipt: TransactionReceipt
-    }
+          type: StageType.RECEIPT
+          receipt: TransactionReceipt
+      }
     | {
-        type: StageType.CONFIRMATION
-        no: number
-        receipt: TransactionReceipt
-    }
+          type: StageType.CONFIRMATION
+          no: number
+          receipt: TransactionReceipt
+      }
     | {
-        type: StageType.ERROR
-        error: Error
-    }
+          type: StageType.ERROR
+          error: Error
+      }

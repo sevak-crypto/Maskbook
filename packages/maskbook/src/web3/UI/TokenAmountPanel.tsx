@@ -11,9 +11,8 @@ import {
     TextFieldProps,
 } from '@material-ui/core'
 import classNames from 'classnames'
-import BigNumber from 'bignumber.js'
+import { formatUnits } from 'ethers/lib/utils'
 import { SelectTokenChip, SelectTokenChipProps } from './SelectTokenChip'
-import { formatBalance } from '../../plugins/Wallet/formatter'
 import { MIN_AMOUNT_LENGTH, MAX_AMOUNT_LENGTH } from '../constants'
 import { useStylesExtends } from '../../components/custom-ui-helper'
 import type { EtherTokenDetailed, ERC20TokenDetailed } from '../types'
@@ -130,7 +129,7 @@ export function TokenAmountPanel(props: TokenAmountPanelProps) {
                                 color="textSecondary"
                                 variant="body2"
                                 component="span">
-                                Balance: {formatBalance(new BigNumber(balance), token.decimals, 6)}
+                                Balance: {formatUnits(balance, token.decimals)}
                             </Typography>
                         ) : null}
                         <Box
@@ -151,9 +150,7 @@ export function TokenAmountPanel(props: TokenAmountPanelProps) {
                                     color="primary"
                                     variant="outlined"
                                     onClick={() => {
-                                        onAmountChange(
-                                            formatBalance(new BigNumber(maxAmount ?? balance), token.decimals),
-                                        )
+                                        onAmountChange(formatUnits(maxAmount ?? balance, token.decimals))
                                     }}
                                     {...MaxChipProps}
                                 />

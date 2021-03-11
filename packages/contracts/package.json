@@ -7,6 +7,7 @@
   "devDependencies": {
     "@ethersproject/contracts": "^5.0.12",
     "@typechain/ethers-v5": "^6.0.2",
+    "ethers": "^5.0.32",
     "ts-generator": "^0.1.1",
     "typechain": "4.0.1"
   }

@@ -91,9 +91,7 @@ export function useERC20TokenApproveCallback(address: string, amount?: string, s
             }
 
             // step 1: estimate gas
-            const estimatedGas = await erc20Contract
-                // general fallback for tokens who restrict approval amounts
-                .estimateGas
+            const estimatedGas = await erc20Contract.estimateGas // general fallback for tokens who restrict approval amounts
                 .approve(spender, useExact ? amount : MaxUint256)
                 .catch(() => {
                     // if the current approve strategy is failed

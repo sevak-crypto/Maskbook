@@ -11,7 +11,9 @@ export async function getBlockNumber(chainId: ChainId) {
 }
 
 export async function getBalance(address: string, chainId: ChainId) {
-    return Maskbook.createProvider(chainId).getBalance(address)
+    const balance = await Maskbook.createProvider(chainId).getBalance(address)
+    console.log(balance)
+    return balance
 }
 
 export async function getTransaction(id: string, chainId: ChainId) {
