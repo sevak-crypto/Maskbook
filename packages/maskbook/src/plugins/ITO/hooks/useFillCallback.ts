@@ -1,20 +1,20 @@
 import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import Web3Utils from 'web3-utils'
-import type { TransactionReceipt } from 'web3-core'
+import { sha256 } from 'ethers/lib/utils'
+import type { TransactionRequest } from '@ethersproject/providers'
+import type { ITO } from '@dimensiondev/contracts/types/ITO'
+import type { MaskITO } from '@dimensiondev/contracts/types/MaskITO'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useITO_Contract } from '../contracts/useITO_Contract'
-import { EtherTokenDetailed, ERC20TokenDetailed, TransactionEventType } from '../../../web3/types'
-import type { Tx } from '@dimensiondev/contracts/types/types'
+import type { EtherTokenDetailed, ERC20TokenDetailed } from '../../../web3/types'
 import { addGasMargin } from '../../../web3/helpers'
 import { gcd, sortTokens } from '../helpers'
 import { ITO_CONSTANTS, ITO_CONTRACT_BASE_TIMESTAMP, MASK_ITO_CONTRACT_BASE_TIMESTAMP } from '../constants'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import Services from '../../../extension/service'
 import { useChainId } from '../../../web3/hooks/useChainState'
-import type { ITO } from '@dimensiondev/contracts/types/ITO'
-import type { MaskITO } from '@dimensiondev/contracts/types/MaskITO'
+import { StageType } from '../../../extension/background-script/EthereumService'
 
 export interface PoolSettings {
     isMask: boolean
@@ -122,7 +122,7 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         }
 
         // error: limit greater than the total supply
-        if (new BigNumber(limit).isGreaterThan(total)) {
+        if (new BigNumber(limit).gt(total)) {
             setFillState({
                 type: TransactionStateType.FAILED,
                 error: new Error('Limits should less than the total supply.'),
@@ -131,7 +131,7 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         }
 
         // error: exceed the max available total supply
-        if (new BigNumber(total).isGreaterThan(new BigNumber('2e128'))) {
+        if (new BigNumber(total).gt(new BigNumber('2e128'))) {
             setFillState({
                 type: TransactionStateType.FAILED,
                 error: new Error('Exceed the max available total supply'),
@@ -153,11 +153,11 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         const exchangeAmountsDivided = exchangeAmounts.map((x, i) => {
             const amount = new BigNumber(x)
             const divisor = gcd(ONE_TOKEN, amount)
-            return [amount.dividedToIntegerBy(divisor), ONE_TOKEN.dividedToIntegerBy(divisor)] as const
+            return [amount.div(divisor), ONE_TOKEN.div(divisor)] as const
         })
         const totalAmount = new BigNumber(total)
         const invalidTokenAt = exchangeAmountsDivided.findIndex(([tokenAmountA, tokenAmountB]) =>
-            totalAmount.multipliedBy(tokenAmountA).dividedToIntegerBy(tokenAmountB).isZero(),
+            totalAmount.multipliedBy(tokenAmountA).div(tokenAmountB).isZero(),
         )
         if (invalidTokenAt >= 0) {
             setFillState({
@@ -197,79 +197,80 @@ export function useFillCallback(poolSettings?: PoolSettings) {
             type: TransactionStateType.WAIT_FOR_CONFIRMING,
         })
 
-        const config: Tx = {
+        const request: TransactionRequest = {
             from: account,
             to: ITO_Contract.options.address,
             value: '0',
         }
         let params = isMask
             ? ([
-                  Web3Utils.sha3(signedPassword)!,
+                sha256(signedPassword)!,
                   startTime_,
                   endTime_,
                   name,
                   title,
                   exchangeTokens.map((x) => x.address),
-                  exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toFixed()),
+                exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
                   token.address,
                   total,
                   limit,
                   DEFAULT_QUALIFICATION_ADDRESS,
-              ] as Parameters<MaskITO['methods']['fill_pool']>)
+            ] as Parameters<MaskITO['fill_pool']>)
             : ([
-                  Web3Utils.sha3(signedPassword)!,
+                sha256(signedPassword)!,
                   startTime_,
                   endTime_,
                   name,
                   title,
                   exchangeTokens.map((x) => x.address),
-                  exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toFixed()),
+                exchangeAmountsDivided.flatMap((x) => x).map((y) => y.toString()),
                   token.address,
                   total,
                   limit,
                   DEFAULT_QUALIFICATION_ADDRESS,
-              ] as Parameters<ITO['methods']['fill_pool']>)
+            ] as Parameters<ITO['fill_pool']>)
 
         // step 1: estimate gas
-        const estimatedGas = await ITO_Contract.methods
-            .fill_pool(...params)
-            .estimateGas(config)
-            .catch((error: Error) => {
-                setFillState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                throw error
+        const estimatedGas = await ITO_Contract.estimateGas.fill_pool(...params).catch((error: Error) => {
+            setFillState({
+                type: TransactionStateType.FAILED,
+                error,
             })
+            throw error
+        })
 
         // step 2: blocking
         return new Promise<void>(async (resolve, reject) => {
-            const promiEvent = ITO_Contract.methods.fill_pool(...params).send({
-                gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
-                ...config,
+            const transaction = await ITO_Contract.fill_pool(...params, {
+                gas: estimatedGas,
             })
-            promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
-                setFillState({
-                    type: TransactionStateType.CONFIRMED,
-                    no: 0,
-                    receipt,
-                })
-            })
-            promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
-                setFillState({
-                    type: TransactionStateType.CONFIRMED,
-                    no,
-                    receipt,
-                })
-                resolve()
-            })
-            promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
-                setFillState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                reject(error)
-            })
+
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.RECEIPT:
+                        setFillState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: 0,
+                            receipt: stage.receipt,
+                        })
+                        break
+                    case StageType.CONFIRMATION:
+                        setFillState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: stage.no,
+                            receipt: stage.receipt,
+                        })
+                        resolve()
+                        break
+                    case StageType.ERROR:
+                        setFillState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [account, chainId, ITO_Contract, DEFAULT_QUALIFICATION_ADDRESS, poolSettings])
 

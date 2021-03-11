@@ -151,11 +151,11 @@ export function TradeForm(props: TradeFormProps) {
     const inputPanelLabel =
         loading && !isExactIn
             ? t('plugin_trader_finding_price')
-            : 'From' + (!isExactIn && inputTokenTradeAmount.isGreaterThan(0) ? ' (estimated)' : '')
+            : 'From' + (!isExactIn && inputTokenTradeAmount.gt(0) ? ' (estimated)' : '')
     const outputPanelLabel =
         loading && isExactIn
             ? t('plugin_trader_finding_price')
-            : 'To' + (isExactIn && outputTokenTradeAmount.isGreaterThan(0) ? ' (estimated)' : '')
+            : 'To' + (isExactIn && outputTokenTradeAmount.gt(0) ? ' (estimated)' : '')
     const sections = [
         {
             key: 'input',
@@ -163,7 +163,7 @@ export function TradeForm(props: TradeFormProps) {
                 <TokenAmountPanel
                     label={inputPanelLabel}
                     amount={inputAmount}
-                    balance={inputTokenBalanceAmount.toFixed()}
+                    balance={inputTokenBalanceAmount.toString()}
                     token={inputToken}
                     onAmountChange={onInputAmountChange}
                     TextFieldProps={{
@@ -191,7 +191,7 @@ export function TradeForm(props: TradeFormProps) {
                 <TokenAmountPanel
                     label={outputPanelLabel}
                     amount={outputAmount}
-                    balance={outputTokenBalanceAmount.toFixed()}
+                    balance={outputTokenBalanceAmount.toString()}
                     token={outputToken}
                     onAmountChange={onOutputAmountChange}
                     MaxChipProps={{ style: { display: 'none' } }}
@@ -220,7 +220,7 @@ export function TradeForm(props: TradeFormProps) {
         if (inputTokenTradeAmount.isZero() && outputTokenTradeAmount.isZero())
             return t('plugin_trader_error_amount_absence')
         if (!inputToken || !outputToken) return t('plugin_trader_error_amount_absence')
-        if (inputTokenBalanceAmount.isLessThan(inputTokenTradeAmount))
+        if (inputTokenBalanceAmount.lt(inputTokenTradeAmount))
             return t('plugin_trader_error_insufficient_balance', {
                 symbol: inputToken?.symbol,
             })
@@ -232,9 +232,9 @@ export function TradeForm(props: TradeFormProps) {
         loading,
         inputToken,
         outputToken,
-        inputTokenBalanceAmount.toFixed(),
-        inputTokenTradeAmount.toFixed(),
-        outputTokenTradeAmount.toFixed(),
+        inputTokenBalanceAmount.toString(),
+        inputTokenTradeAmount.toString(),
+        outputTokenTradeAmount.toString(),
         trade?.priceImpact,
     ])
     //#endregion
@@ -265,7 +265,7 @@ export function TradeForm(props: TradeFormProps) {
             <div className={classes.section}>
                 <EthereumWalletConnectedBoundary>
                     <EthereumERC20TokenApprovedBoundary
-                        amount={approveAmount.toFixed()}
+                        amount={approveAmount.toString()}
                         token={approveToken?.type === EthereumTokenType.ERC20 ? approveToken : undefined}
                         spender={approveAddress}>
                         <ActionButton

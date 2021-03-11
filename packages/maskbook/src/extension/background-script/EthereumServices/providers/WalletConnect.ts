@@ -1,8 +1,9 @@
 import { first } from 'lodash-es'
-import type { Eth } from 'web3-eth'
-import type { Personal } from 'web3-eth-personal'
 import { EthereumAddress } from 'wallet.ts'
-import type { PromiEvent as PromiEventW3 } from 'web3-core'
+import { toUtf8String } from 'ethers/lib/utils'
+import type { Signer } from '@ethersproject/abstract-signer'
+import type { TransactionRequest } from '@ethersproject/providers'
+import type { Bytes } from '@ethersproject/bytes'
 import WalletConnect from '@walletconnect/client'
 import type { ITxData } from '@walletconnect/types'
 import * as Maskbook from '../providers/Maskbook'
@@ -12,7 +13,6 @@ import {
     currentSelectedWalletAddressSettings,
     currentSelectedWalletProviderSettings,
 } from '../../../../plugins/Wallet/settings'
-import { TransactionEventType } from '../../../../web3/types'
 import { ProviderType } from '../../../../web3/types'
 
 let connector: WalletConnect | null = null
@@ -48,39 +48,25 @@ export async function createConnectorIfNeeded() {
     return createConnector()
 }
 
-//#region hijack web3js calls and forword them to walletconnenct APIs
-function hijackETH(eth: Eth) {
-    return new Proxy(eth, {
+function hijackSigner(signer: Signer) {
+    return new Proxy(signer, {
         get(target, name) {
             switch (name) {
-                case 'personal':
-                    return hijackPersonal(Reflect.get(target, 'personal'))
+                // learn moreabout personal sign in ethers: https://github.com/ethers-io/ethers.js/issues/98
+                case 'signMessage':
+                    return (message: Bytes | string) => {
+                        const address = first(connector?.accounts) ?? ''
+                        return connector?.signPersonalMessage([
+                            typeof message === 'string' ? message : toUtf8String(message),
+                            address,
+                            '',
+                        ]) as Promise<string>
+                    }
                 case 'sendTransaction':
-                    return (txData: ITxData, callback?: () => void) => {
-                        const listeners: { name: string; listener: Function }[] = []
-                        const promise = connector?.sendTransaction(txData) as Promise<string>
-
-                        // mimic PromiEvent API
-                        Object.assign(promise, {
-                            on(name: string, listener: Function) {
-                                listeners.push({ name, listener })
-                            },
-                        })
-
-                        // only trasnaction hash available
-                        promise
-                            .then((hash) => {
-                                listeners
-                                    .filter((x) => x.name === TransactionEventType.TRANSACTION_HASH)
-                                    .forEach((y) => y.listener(hash))
-                            })
-                            .catch((e) => {
-                                listeners
-                                    .filter((x) => x.name === TransactionEventType.ERROR)
-                                    .forEach((y) => y.listener(e))
-                            })
-
-                        return (promise as unknown) as PromiEventW3<string>
+                    return async (request: TransactionRequest) => {
+                        const provider = createProvider()
+                        const hash = await (connector?.sendTransaction(request as ITxData) as Promise<string>)
+                        return provider.getTransaction(hash)
                     }
                 default:
                     return Reflect.get(target, name)
@@ -89,36 +75,13 @@ function hijackETH(eth: Eth) {
     })
 }
 
-function hijackPersonal(personal: Personal) {
-    return new Proxy(personal, {
-        get(target, name) {
-            switch (name) {
-                // personal_sign
-                case 'sign':
-                    return async (
-                        data: string,
-                        address: string,
-                        password: string,
-                        callback?: (signed: string) => void,
-                    ) => {
-                        const signed = (await connector?.signPersonalMessage([data, address, password])) as string
-                        if (callback) callback(signed)
-                        return signed
-                    }
-                default:
-                    return Reflect.get(target, name)
-            }
-        },
-    })
+export function createSigner() {
+    const signer = Maskbook.createSigner('')
+    return hijackSigner(signer)
 }
 
-// Wrap promise as PromiEvent because WalletConnect returns transaction hash only
-// docs: https://docs.walletconnect.org/client-api
-export function createWeb3() {
-    const web3 = Maskbook.createWeb3(currentWalletConnectChainIdSettings.value)
-    return Object.assign(web3, {
-        eth: hijackETH(web3.eth),
-    })
+export function createProvider() {
+    return Maskbook.createProvider(currentWalletConnectChainIdSettings.value)
 }
 //#endregion
 

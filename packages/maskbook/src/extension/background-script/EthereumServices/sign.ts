@@ -20,11 +20,11 @@ export async function sign(data: string, address: string, chainId: ChainId) {
     switch (currentSelectedWalletProviderSettings.value) {
         case ProviderType.Maskbook:
             if (!wallet._private_key_ || wallet._private_key_ === '0x') throw new Error('cannot sign with given wallet')
-            return Maskbook.createWeb3(chainId, [wallet._private_key_]).eth.sign(data, address)
+            return Maskbook.createSigner(wallet._private_key_).signMessage(data)
         case ProviderType.MetaMask:
-            return (await MetaMask.createWeb3()).eth.personal.sign(data, address, '')
+            return (await MetaMask.createSigner()).signMessage(data)
         case ProviderType.WalletConnect:
-            return WalletConnect.createWeb3().eth.personal.sign(data, address, '')
+            return WalletConnect.createSigner().signMessage(data)
         default:
             throw new Error('cannot sign with given wallet')
     }

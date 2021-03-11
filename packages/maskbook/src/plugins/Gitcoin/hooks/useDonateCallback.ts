@@ -3,11 +3,12 @@ import BigNumber from 'bignumber.js'
 import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed } from '../../../web3/types'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import { GITCOIN_CONSTANT } from '../constants'
-import { addGasMargin } from '../../../web3/helpers'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
-import type { Tx } from '@dimensiondev/contracts/types/types'
 import { useBulkCheckoutContract } from '../contracts/useBulkCheckoutWallet'
 import { useAccount } from '../../../web3/hooks/useAccount'
+import type { TransactionRequest } from '@ethersproject/providers'
+import Services from '../../../extension/service'
+import { StageType } from '../../../extension/background-script/EthereumService'
 
 /**
  * A callback for donate gitcoin grant
@@ -25,17 +26,17 @@ export function useDonateCallback(address: string, amount: string, token?: Ether
 
     const donations = useMemo(() => {
         const tipAmount = new BigNumber(GITCOIN_TIP_PERCENTAGE / 100).multipliedBy(amount)
-        const grantAmount = new BigNumber(amount).minus(tipAmount)
+        const grantAmount = new BigNumber(amount).sub(tipAmount)
         if (!address || !token) return []
         return [
             {
                 token: token.type === EthereumTokenType.Ether ? GITCOIN_ETH_ADDRESS : token.address,
-                amount: tipAmount.toFixed(),
+                amount: tipAmount.toString(),
                 dest: address,
             },
             {
                 token: token.type === EthereumTokenType.Ether ? GITCOIN_ETH_ADDRESS : token.address,
-                amount: grantAmount.toFixed(),
+                amount: grantAmount.toString(),
                 dest: address,
             },
         ]
@@ -55,45 +56,43 @@ export function useDonateCallback(address: string, amount: string, token?: Ether
         })
 
         // step 1: estimate gas
-        const config: Tx = {
+        const config: TransactionRequest = {
             from: account,
             to: bulkCheckoutContract.options.address,
-            value: new BigNumber(token.type === EthereumTokenType.Ether ? amount : 0).toFixed(),
+            value: new BigNumber(token.type === EthereumTokenType.Ether ? amount : 0).toString(),
         }
-        const estimatedGas = await bulkCheckoutContract.methods
-            .donate(donations)
-            .estimateGas(config)
-            .catch((error) => {
-                setDonateState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                throw error
+        const estimatedGas = await bulkCheckoutContract.estimateGas.donate(donations).catch((error) => {
+            setDonateState({
+                type: TransactionStateType.FAILED,
+                error,
             })
+            throw error
+        })
 
         // step 2: blocking
-        return new Promise<string>((resolve, reject) => {
-            bulkCheckoutContract.methods.donate(donations).send(
-                {
-                    gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
-                    ...config,
-                },
-                (error, hash) => {
-                    if (error) {
-                        setDonateState({
-                            type: TransactionStateType.FAILED,
-                            error,
-                        })
-                        reject(error)
-                    } else {
+        return new Promise<string>(async (resolve, reject) => {
+            const transaction = await bulkCheckoutContract.donate(donations, {
+                gasLimit: estimatedGas,
+            })
+
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.TRANSACTION_HASH:
                         setDonateState({
                             type: TransactionStateType.HASH,
-                            hash,
+                            hash: stage.hash,
                         })
-                        resolve(hash)
-                    }
-                },
-            )
+                        resolve(stage.hash)
+                        break
+                    case StageType.ERROR:
+                        setDonateState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [address, account, amount, token, donations])
 

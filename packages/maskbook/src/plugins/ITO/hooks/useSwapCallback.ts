@@ -1,8 +1,4 @@
-import BigNumber from 'bignumber.js'
 import { useCallback } from 'react'
-import Web3Utils from 'web3-utils'
-import type { TransactionReceipt } from 'web3-core'
-import type { Tx } from '@dimensiondev/contracts/types/types'
 import { buf2hex, hex2buf } from '../../../utils/utils'
 import { addGasMargin, isSameAddress } from '../../../web3/helpers'
 import { useAccount } from '../../../web3/hooks/useAccount'
@@ -57,7 +53,7 @@ export function useSwapCallback(
         const config: Tx = {
             from: account,
             to: ITO_Contract.options.address,
-            value: new BigNumber(token.type === EthereumTokenType.Ether ? total : '0').toFixed(),
+            value: new BigNumber(token.type === EthereumTokenType.Ether ? total : '0').toString(),
         }
 
         // error: invalid swap amount
@@ -81,9 +77,7 @@ export function useSwapCallback(
 
         // step 1: check remaining
         try {
-            const availability = await ITO_Contract.methods.check_availability(id).call({
-                from: account,
-            })
+            const availability = await ITO_Contract.check_availability(id)
             if (new BigNumber(availability.remaining).isZero()) {
                 setSwapState({
                     type: TransactionStateType.FAILED,
@@ -120,7 +114,7 @@ export function useSwapCallback(
                       Web3Utils.sha3(account)!,
                       swapTokenAt,
                       total,
-                  ] as Parameters<MaskITO['methods']['swap']>)
+                ] as Parameters<MaskITO['swap']>)
                 : ([
                       id,
                       Web3Utils.soliditySha3(
@@ -131,9 +125,9 @@ export function useSwapCallback(
                       Web3Utils.sha3(account)!,
                       swapTokenAt,
                       total,
-                  ] as Parameters<ITO['methods']['swap']>)
+                ] as Parameters<ITO['swap']>)
 
-        const swap = isMask && testNums ? (ITO_Contract as MaskITO).methods.swap : (ITO_Contract as ITO).methods.swap
+        const swap = isMask && testNums ? (ITO_Contract as MaskITO).swap : (ITO_Contract as ITO).swap
 
         // step 2-1: estimate gas
         const estimatedGas = await swap(...swapParams)
@@ -164,7 +158,7 @@ export function useSwapCallback(
                 reject(error)
             }
             const promiEvent = swap(...swapParams).send({
-                gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
+                gas: addGasMargin(new BigNumber(estimatedGas)).toString(),
                 ...config,
             })
 

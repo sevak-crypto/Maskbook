@@ -131,7 +131,11 @@ export function DonateDialog(props: DonateDialogProps) {
     //#endregion
 
     //#region blocking
-    const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(address ?? '', amount.toFixed(), token)
+    const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(
+        address ?? '',
+        amount.toString(),
+        token,
+    )
     //#endregion
 
     //#region transaction dialog
@@ -184,12 +188,12 @@ export function DonateDialog(props: DonateDialogProps) {
         if (Flags.wallet_network_strict_mode_enabled && chainId !== ChainId.Mainnet)
             return t('plugin_wallet_wrong_network')
         if (!amount || amount.isZero()) return t('plugin_gitcoin_enter_an_amount')
-        if (amount.isGreaterThan(new BigNumber(tokenBalance)))
+        if (amount.gt(new BigNumber(tokenBalance)))
             return t('plugin_gitcoin_insufficient_balance', {
                 symbol: token.symbol,
             })
         return ''
-    }, [account, address, amount.toFixed(), chainId, token, tokenBalance])
+    }, [account, address, amount.toString(), chainId, token, tokenBalance])
     //#endregion
 
     if (!token || !address) return null
@@ -229,7 +233,7 @@ export function DonateDialog(props: DonateDialogProps) {
                     </Typography>
                     <EthereumWalletConnectedBoundary>
                         <EthereumERC20TokenApprovedBoundary
-                            amount={amount.toFixed()}
+                            amount={amount.toString()}
                             spender={BULK_CHECKOUT_ADDRESS}
                             token={token?.type === EthereumTokenType.ERC20 ? token : undefined}>
                             <ActionButton

@@ -1,13 +1,11 @@
 import { useCallback } from 'react'
-import BigNumber from 'bignumber.js'
 import { EthereumAddress } from 'wallet.ts'
-import type { TransactionReceipt } from 'web3-core'
 import { useAccount } from './useAccount'
-import { useERC20TokenContract } from '../contracts/useERC20TokenContract'
 import { TransactionStateType, useTransactionState } from './useTransactionState'
-import { TransactionEventType } from '../types'
 import { useERC721TokenContract } from '../contracts/useERC721TokenContract'
 import { isSameAddress } from '../helpers'
+import Services from '../../extension/service'
+import { StageType } from '../../extension/background-script/EthereumService'
 
 export function useERC721TokenTransferCallback(address: string, tokenId?: string, recipient?: string) {
     const account = useAccount()
@@ -32,7 +30,7 @@ export function useERC721TokenTransferCallback(address: string, tokenId?: string
         }
 
         // error: invalid token
-        const ownerOf = await erc721Contract.methods.ownerOf(tokenId).call()
+        const ownerOf = await erc721Contract.ownerOf(tokenId)
 
         if (!ownerOf || isSameAddress(ownerOf, account) || isSameAddress(ownerOf, recipient)) {
             setTransferState({
@@ -48,40 +46,38 @@ export function useERC721TokenTransferCallback(address: string, tokenId?: string
         })
 
         // step 1: estimate gas
-        const estimatedGas = await erc721Contract.methods.transferFrom(account, recipient, tokenId).estimateGas({
-            from: account,
-            to: erc721Contract.options.address,
-        })
+        const estimatedGas = await erc721Contract.estimateGas.transferFrom(account, recipient, tokenId)
 
         // step 2: blocking
         return new Promise<void>(async (resolve, reject) => {
-            const promiEvent = erc721Contract.methods.transferFrom(account, recipient, tokenId).send({
-                from: account,
-                to: erc721Contract.options.address,
-                gas: estimatedGas,
+            const transaction = await erc721Contract.transferFrom(account, recipient, tokenId, {
+                gasLimit: estimatedGas,
             })
-            promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
-                setTransferState({
-                    type: TransactionStateType.CONFIRMED,
-                    no: 0,
-                    receipt,
-                })
-            })
-            promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
-                setTransferState({
-                    type: TransactionStateType.CONFIRMED,
-                    no,
-                    receipt,
-                })
-                resolve()
-            })
-            promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
-                setTransferState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                reject(error)
-            })
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.RECEIPT:
+                        setTransferState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: 0,
+                            receipt: stage.type,
+                        })
+                        break
+                    case StageType.CONFIRMATION:
+                        setTransferState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: stage.no,
+                            receipt: stage.type,
+                        })
+                        break
+                    case StageType.ERROR:
+                        setTransferState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [account, tokenId, recipient, erc721Contract])
 

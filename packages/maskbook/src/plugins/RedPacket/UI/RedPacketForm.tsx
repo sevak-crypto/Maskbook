@@ -153,7 +153,7 @@ export function RedPacketForm(props: RedPacketFormProps) {
         message,
         shares: shares || 0,
         token,
-        total: totalAmount.toFixed(),
+        total: totalAmount.toString(),
     })
     //#endregion
 
@@ -245,11 +245,7 @@ export function RedPacketForm(props: RedPacketFormProps) {
         if (!token) return t('plugin_wallet_select_a_token')
         if (!account) return t('plugin_wallet_connect_a_wallet')
         if (new BigNumber(shares || '0').isZero()) return 'Enter shares'
-        if (new BigNumber(shares || '0').isGreaterThan(255)) return 'At most 255 recipients'
-        if (new BigNumber(amount).isZero()) return 'Enter an amount'
-        if (new BigNumber(totalAmount).isGreaterThan(new BigNumber(tokenBalance)))
-            return `Insufficient ${token.symbol} balance`
-        return ''
+        if (new BigNumber(shares || '0').gt(255)) return 'At most 255 recipients'
     }, [account, amount, totalAmount, shares, token, tokenBalance])
 
     if (!token) return null
@@ -327,7 +323,7 @@ export function RedPacketForm(props: RedPacketFormProps) {
             </div>
             <EthereumWalletConnectedBoundary>
                 <EthereumERC20TokenApprovedBoundary
-                    amount={amount.toFixed()}
+                    amount={amount.toString()}
                     token={token?.type === EthereumTokenType.ERC20 ? token : undefined}
                     spender={RED_PACKET_ADDRESS}>
                     <ActionButton className={classes.button} fullWidth onClick={createCallback}>

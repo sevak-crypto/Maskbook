@@ -90,7 +90,7 @@ export function useCheckCallback() {
 
                 // revalidate by contract
                 const { index, address, amount, proof } = packet
-                const { available, claimable, start, end } = await airdropContract.methods
+                const { available, claimable, start, end } = await airdropContract
                     .check(index, formatEthereumAddress(address), amount, proof)
                     .call()
 
@@ -102,13 +102,13 @@ export function useCheckCallback() {
 
                 setCheckState({
                     type:
-                        available && new BigNumber(claimable).isGreaterThan(0) && isStart && !isEnd
+                        available && new BigNumber(claimable).gt(0) && isStart && !isEnd
                             ? CheckStateType.YEP
                             : CheckStateType.NOPE,
                     packet,
                     start: start_,
                     end: end_,
-                    claimable: available && new BigNumber(claimable).isGreaterThan(0) && !isEnd ? claimable : '0',
+                    claimable: available && new BigNumber(claimable).gt(0) && !isEnd ? claimable : '0',
                     ratio: new BigNumber(claimable).div(amount),
                 })
             } catch (error) {

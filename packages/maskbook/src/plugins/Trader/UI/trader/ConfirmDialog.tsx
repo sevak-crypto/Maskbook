@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, makeStyles, createStyles, DialogActions, DialogContent, Typography } from '@material-ui/core'
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward'
-import type BigNumber from 'bignumber.js'
+import type { BigNumber } from 'ethers'
 import { useStylesExtends } from '../../../../components/custom-ui-helper'
 import { TradeSummary, TradeSummaryProps } from '../trader/TradeSummary'
 import { TokenPanel } from './TokenPanel'
@@ -76,9 +76,9 @@ export function ConfirmDialogUI(props: ConfirmDialogUIProps) {
                 <DialogContent>
                     {inputToken && outputToken ? (
                         <>
-                            <TokenPanel amount={inputAmount.toFixed() ?? '0'} token={inputToken} />
+                            <TokenPanel amount={inputAmount.toString() ?? '0'} token={inputToken} />
                             <ArrowDownwardIcon className={classes.reverseIcon} />
-                            <TokenPanel amount={outputAmount.toFixed() ?? '0'} token={outputToken} />
+                            <TokenPanel amount={outputAmount.toString() ?? '0'} token={outputToken} />
                         </>
                     ) : null}
                     {staled ? (

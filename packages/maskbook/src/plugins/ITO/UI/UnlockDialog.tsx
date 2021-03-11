@@ -19,7 +19,7 @@ import { SelectTokenDialogEvent, WalletMessages } from '../../Wallet/messages'
 import { ITO_CONSTANTS } from '../constants'
 
 function isMoreThanMillion(allowance: string, decimals: number) {
-    return new BigNumber(allowance).isGreaterThan(`100000000000e${decimals}`) // 100 billion
+    return new BigNumber(allowance).gt(`100000000000e${decimals}`) // 100 billion
 }
 
 const useStyles = makeStyles((theme) =>
@@ -116,7 +116,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
                 to use your {token.symbol ?? 'Token'} tokens when a new ITO round starts later.
             </Typography>
             <EthereumWalletConnectedBoundary>
-                <EthereumERC20TokenApprovedBoundary amount={amount.toFixed()} spender={recipientAddress} token={token}>
+                <EthereumERC20TokenApprovedBoundary amount={amount.toString()} spender={recipientAddress} token={token}>
                     {(allowance: string) => (
                         <ActionButton className={classes.button} size="large" fullWidth disabled variant="contained">
                             {isMoreThanMillion(allowance, token.decimals)
@@ -124,7 +124,7 @@ export function UnlockDialog(props: UnlockDialogProps) {
                                       symbol: token.symbol ?? 'Token',
                                   })
                                 : t('plugin_ito_amount_approved', {
-                                      amount: formatBalance(new BigNumber(allowance), token.decimals, 2),
+                                    amount: formatBalance(new BigNumber(allowance), token.decimals, 2),
                                       symbol: token.symbol ?? 'Token',
                                   })}
                         </ActionButton>

@@ -19,8 +19,8 @@ export function useTradeComputed(
         const [swaps, tradeAmount, spotPrice] = swaps_
         const isExactIn = strategy === TradeStrategy.ExactIn
         const priceImpact = isExactIn
-            ? new BigNumber(inputAmount).div(tradeAmount).times('1e18').div(spotPrice).minus(1)
-            : new BigNumber(tradeAmount).div(outputAmount).times('1e18').div(spotPrice).minus(1)
+            ? new BigNumber(inputAmount).div(tradeAmount).multipliedBy('1e18').div(spotPrice).sub(1)
+            : new BigNumber(tradeAmount).div(outputAmount).multipliedBy('1e18').div(spotPrice).sub(1)
 
         return {
             strategy,

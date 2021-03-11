@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
 import BigNumber from 'bignumber.js'
-import type { TransactionReceipt } from 'web3-core'
+import type { TransactionRequest } from '@ethersproject/providers'
+import type { MaskITO } from '@dimensiondev/contracts/types/MaskITO'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
 import { useAccount } from '../../../web3/hooks/useAccount'
-import { TransactionEventType } from '../../../web3/types'
-import type { Tx } from '@dimensiondev/contracts/types/types'
 import { addGasMargin } from '../../../web3/helpers'
 import { useChainId } from '../../../web3/hooks/useChainState'
 import { useITO_Contract } from '../contracts/useITO_Contract'
-import type { MaskITO } from '@dimensiondev/contracts/types/MaskITO'
+import Services from '../../../extension/service'
+import { StageType } from '../../../extension/background-script/EthereumService'
 
 export function useClaimCallback() {
     const account = useAccount()
@@ -29,52 +29,53 @@ export function useClaimCallback() {
             type: TransactionStateType.WAIT_FOR_CONFIRMING,
         })
 
-        const config: Tx = {
+        const config: TransactionRequest = {
             from: account,
             to: MaskITO_Contract.options.address,
             value: '0',
         }
 
         // step 1: estimate gas
-        const estimatedGas = await MaskITO_Contract.methods
-            .claim()
-            .estimateGas(config)
-            .catch((error: Error) => {
-                setClaimState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                throw error
+        const estimatedGas = await MaskITO_Contract.estimateGas.claim().catch((error: Error) => {
+            setClaimState({
+                type: TransactionStateType.FAILED,
+                error,
             })
+            throw error
+        })
 
         // step 2: blocking
         return new Promise<void>(async (resolve, reject) => {
-            const promiEvent = MaskITO_Contract.methods.claim().send({
-                gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
-                ...config,
+            const transaction = await MaskITO_Contract.claim({
+                gasLimit: addGasMargin(new BigNumber(estimatedGas)).toString(),
             })
-            promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
-                setClaimState({
-                    type: TransactionStateType.CONFIRMED,
-                    no: 0,
-                    receipt,
-                })
-            })
-            promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
-                setClaimState({
-                    type: TransactionStateType.CONFIRMED,
-                    no,
-                    receipt,
-                })
-                resolve()
-            })
-            promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
-                setClaimState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                reject(error)
-            })
+
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.RECEIPT:
+                        setClaimState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: 0,
+                            receipt: stage.receipt,
+                        })
+                        break
+                    case StageType.CONFIRMATION:
+                        setClaimState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: stage.no,
+                            receipt: stage.receipt,
+                        })
+                        resolve()
+                        break
+                    case StageType.ERROR:
+                        setClaimState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [account, chainId, MaskITO_Contract])
 

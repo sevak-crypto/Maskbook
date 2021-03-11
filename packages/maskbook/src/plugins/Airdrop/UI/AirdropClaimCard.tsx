@@ -113,10 +113,10 @@ export function AirdropClaimCard(props: AirdropClaimCardProps) {
     const shareLink = useShareLink(
         [
             `I just claimed ${cashTag}${token?.symbol} with ${
-                new BigNumber(packet?.amount ?? '0')
-                    .multipliedBy(checkState.type === CheckStateType.YEP ? checkState.ratio : 1)
+            new BigNumber(packet?.amount ?? '0')
+                .multipliedBy(checkState.type === CheckStateType.YEP ? checkState.ratio : 1)
                     .dp(0)
-                    .toFixed() + '.00'
+                .toString() + '.00'
             }. Follow @realMaskbook (mask.io) to claim airdrop.`,
             postLink,
         ].join('\n'),
@@ -156,7 +156,7 @@ export function AirdropClaimCard(props: AirdropClaimCardProps) {
                     : 0,
             )
                 .multipliedBy(new BigNumber(10).pow(token.decimals))
-                .toFixed(),
+                .toString(),
         )
     }, [checkState, token, onUpdateAmount])
     //#endregion

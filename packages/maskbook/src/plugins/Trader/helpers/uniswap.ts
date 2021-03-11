@@ -81,11 +81,11 @@ export function uniswapChainIdTo(chainId: UniswapChainId) {
 }
 
 export function uniswapPercentTo(percent: UniswapPercent) {
-    return new BigNumber(percent.numerator.toString()).dividedBy(new BigNumber(percent.denominator.toString()))
+    return new BigNumber(percent.numerator.toString()).div(new BigNumber(percent.denominator.toString()))
 }
 
 export function uniswapPriceTo(price: UniswapPrice) {
-    return new BigNumber(price.scalar.numerator.toString()).dividedBy(price.scalar.denominator.toString())
+    return new BigNumber(price.scalar.numerator.toString()).div(price.scalar.denominator.toString())
 }
 
 export function uniswapTokenTo(token: UniswapToken) {

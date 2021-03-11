@@ -89,7 +89,7 @@ export function TradeSummary(props: TradeSummaryProps) {
     const isExactIn = strategy === TradeStrategy.ExactIn
 
     const records: SummaryRecord[] = [
-        inputAmount.isGreaterThan('0') && outputAmount.isGreaterThan('0')
+        inputAmount.gt(0) && outputAmount.gt(0)
             ? {
                   title: 'Price',
                   children: (
@@ -99,10 +99,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                                   <strong className={classes.emphasis}>
                                       {formatBalance(
                                           outputAmount
-                                              .dividedBy(inputAmount)
-                                              .multipliedBy(
-                                                  new BigNumber(10).pow(inputToken.decimals - outputToken.decimals),
-                                              )
+                                              .div(inputAmount)
+                                              .multipliedBy(new BigNumber(10).pow(inputToken.decimals - outputToken.decimals))
                                               .multipliedBy(new BigNumber(10).pow(outputToken.decimals))
                                               .integerValue(),
                                           outputToken.decimals,
@@ -118,10 +116,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                                   <strong className={classes.emphasis}>
                                       {formatBalance(
                                           inputAmount
-                                              .dividedBy(outputAmount)
-                                              .multipliedBy(
-                                                  new BigNumber(10).pow(outputToken.decimals - inputToken.decimals),
-                                              )
+                                              .div(outputAmount)
+                                              .multipliedBy(new BigNumber(10).pow(outputToken.decimals - inputToken.decimals))
                                               .multipliedBy(new BigNumber(10).pow(inputToken.decimals))
                                               .integerValue(),
                                           inputToken.decimals,
@@ -181,8 +177,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                     style={{
                         color: resolveUniswapWarningLevelColor(resolveUniswapWarningLevel(priceImpactWithoutFee)),
                     }}>
-                    {priceImpactWithoutFee.isGreaterThan('0')
-                        ? priceImpactWithoutFee?.isLessThan(ONE_BIPS)
+                    {priceImpactWithoutFee.gt(0)
+                        ? priceImpactWithoutFee?.lt(ONE_BIPS)
                             ? '<0.01%'
                             : `${formatPercentage(priceImpactWithoutFee)}`
                         : '-'}
@@ -208,8 +204,8 @@ export function TradeSummary(props: TradeSummaryProps) {
                     style={{
                         color: resolveUniswapWarningLevelColor(resolveUniswapWarningLevel(priceImpact)),
                     }}>
-                    {priceImpact.isGreaterThan('0')
-                        ? priceImpact?.isLessThan(ONE_BIPS)
+                    {priceImpact.gt(0)
+                        ? priceImpact?.lt(ONE_BIPS)
                             ? '<0.01%'
                             : `${formatPercentage(priceImpact)}`
                         : '-'}
@@ -226,15 +222,15 @@ export function TradeSummary(props: TradeSummaryProps) {
                 <Typography className={classes.title}>
                     {(trade_?.sources ?? [])
                         .filter(
-                            (x) =>
-                                x.proportion !== '0' &&
-                                new BigNumber(x.proportion).isGreaterThan(new BigNumber('0.00001')),
+                            (x) => x.proportion !== '0' && new BigNumber(x.proportion).gt(new BigNumber('0.00001')),
                         )
-                        .sort((a, z) => (new BigNumber(a.proportion).isGreaterThan(z.proportion) ? -1 : 1))
+                        .sort((a, z) => (new BigNumber(a.proportion).gt(z.proportion) ? -1 : 1))
                         .slice(0, 3)
                         .map(
                             (y) =>
-                                `${resolveZrxTradePoolName(y.name)} (${formatPercentage(new BigNumber(y.proportion))})`,
+                                `${resolveZrxTradePoolName(y.name)} (${formatPercentage(
+                                    new BigNumber(y.proportion),
+                                )})`,
                         )
                         .join(' + ')}
                 </Typography>

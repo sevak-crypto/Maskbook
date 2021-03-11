@@ -1,7 +1,7 @@
 import { Component, useCallback, useState, useEffect, useMemo } from 'react'
 import classNames from 'classnames'
 import { makeStyles, createStyles, Card, Typography, Box, Link, Grid, Theme } from '@material-ui/core'
-import { BigNumber } from 'bignumber.js'
+import BigNumber from 'bignumber.js'
 import { useRemoteControlledDialog } from '../../../utils/hooks/useRemoteControlledDialog'
 import { TransactionStateType } from '../../../web3/hooks/useTransactionState'
 import { WalletMessages } from '../../Wallet/messages'
@@ -13,7 +13,7 @@ import { useChainId, useChainIdValid } from '../../../web3/hooks/useChainState'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import OpenInNewIcon from '@material-ui/icons/OpenInNew'
 import { StyledLinearProgress } from './StyledLinearProgress'
-import { formatAmountPrecision, formatBalance } from '../../Wallet/formatter'
+import { formatBalance } from '../../Wallet/formatter'
 import { useAvailabilityComputed } from '../hooks/useAvailabilityComputed'
 import ActionButton from '../../../extension/options-page/DashboardComponents/ActionButton'
 import { formatDateTime } from '../../../utils/date'
@@ -226,7 +226,7 @@ export function ITO(props: ITO_Props) {
 
     const total = new BigNumber(payload_total)
     const total_remaining = new BigNumber(payload_total_remaining)
-    const sold = total.minus(total_remaining)
+    const sold = total.sub(total_remaining)
 
     //#region token detailed
     const {
@@ -272,7 +272,7 @@ export function ITO(props: ITO_Props) {
     const refundAmount = useMemo(
         () =>
             tradeInfo?.buyInfo
-                ? new BigNumber(tradeInfo?.buyInfo.amount).minus(new BigNumber(tradeInfo?.buyInfo.amount_sold))
+                ? new BigNumber(tradeInfo?.buyInfo.amount).sub(new BigNumber(tradeInfo?.buyInfo.amount_sold))
                 : new BigNumber(0),
         [tradeInfo],
     )
@@ -344,7 +344,7 @@ export function ITO(props: ITO_Props) {
             if (token) {
                 summary +=
                     comma +
-                    formatBalance(new BigNumber(availability?.exchanged_tokens[i]), token.decimals ?? 0) +
+                formatBalance(new BigNumber(availability?.exchanged_tokens[i]), token.decimals ?? 0) +
                     ' ' +
                     token.symbol
             }
@@ -384,7 +384,7 @@ export function ITO(props: ITO_Props) {
             symbol: token.symbol,
         })
 
-        if (refundAmount.isZero() || refundAmount.isLessThan(0)) {
+        if (refundAmount.isZero() || refundAmount.lt(0)) {
             return `${_text}.`
         }
 
@@ -468,8 +468,8 @@ export function ITO(props: ITO_Props) {
                 </Box>
                 <Typography variant="body2" className={classes.totalText}>
                     {t('plugin_ito_swapped_status', {
-                        remain: formatAmountPrecision(sold, token.decimals),
-                        total: formatAmountPrecision(total, token.decimals),
+                        remain: formatBalance(sold, token.decimals),
+                        total: formatBalance(total, token.decimals),
                         token: token.symbol,
                     })}
                     <Link
@@ -481,10 +481,7 @@ export function ITO(props: ITO_Props) {
                     </Link>
                 </Typography>
                 <Box className={classes.progressWrap}>
-                    <StyledLinearProgress
-                        variant="determinate"
-                        value={Number(sold.multipliedBy(100).dividedBy(total))}
-                    />
+                    <StyledLinearProgress variant="determinate" value={Number(sold.multipliedBy(100).div(total))} />
                 </Box>
                 <Box>
                     {exchange_tokens
@@ -495,12 +492,9 @@ export function ITO(props: ITO_Props) {
                                 <TokenItem
                                     price={formatBalance(
                                         new BigNumber(exchange_amounts[i * 2])
-                                            .dividedBy(new BigNumber(exchange_amounts[i * 2 + 1]))
-                                            .multipliedBy(
-                                                new BigNumber(10).pow(token.decimals - exchange_tokens[i].decimals),
-                                            )
-                                            .multipliedBy(new BigNumber(10).pow(exchange_tokens[i].decimals))
-                                            .integerValue(),
+                                            .div(new BigNumber(exchange_amounts[i * 2 + 1]))
+                                            .multipliedBy(new BigNumber(10).pow(token.decimals - exchange_tokens[i].decimals))
+                                            .multipliedBy(new BigNumber(10).pow(exchange_tokens[i].decimals)),
                                         exchange_tokens[i].decimals,
                                     )}
                                     token={token}

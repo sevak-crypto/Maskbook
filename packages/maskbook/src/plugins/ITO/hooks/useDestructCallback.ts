@@ -33,8 +33,7 @@ export function useDestructCallback(isMask: boolean) {
             }
 
             // step 1: estimate gas
-            const estimatedGas = await ITO_Contract.methods
-                .destruct(id)
+            const estimatedGas = await ITO_Contract.destruct(id)
                 .estimateGas(config)
                 .catch((error: Error) => {
                     setDestructState({
@@ -61,8 +60,8 @@ export function useDestructCallback(isMask: boolean) {
                     })
                     reject(error)
                 }
-                const promiEvent = ITO_Contract.methods.destruct(id).send({
-                    gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
+                const promiEvent = ITO_Contract.destruct(id).send({
+                    gas: addGasMargin(new BigNumber(estimatedGas)).toString(),
                     ...config,
                 })
 

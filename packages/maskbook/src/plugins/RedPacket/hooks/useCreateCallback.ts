@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import Web3Utils from 'web3-utils'
-import type { TransactionReceipt } from 'web3-core'
 import { useRedPacketContract } from '../contracts/useRedPacketContract'
 import { useTransactionState, TransactionStateType } from '../../../web3/hooks/useTransactionState'
-import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed, TransactionEventType } from '../../../web3/types'
+import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed } from '../../../web3/types'
 import { useAccount } from '../../../web3/hooks/useAccount'
-import type { Tx } from '@dimensiondev/contracts/types/types'
-import { addGasMargin } from '../../../web3/helpers'
+import type { TransactionRequest } from '@ethersproject/abstract-provider'
+import { sha256 } from 'ethers/lib/utils'
+import Services from '../../../extension/service'
+import { StageType } from '../../../extension/background-script/EthereumService'
 
 export interface RedPacketSettings {
     password: string
@@ -37,7 +37,7 @@ export function useCreateCallback(redPacketSettings: RedPacketSettings) {
         }
 
         // error handling
-        if (new BigNumber(total).isLessThan(shares)) {
+        if (new BigNumber(total).lt(shares)) {
             setCreateState({
                 type: TransactionStateType.FAILED,
                 error: new Error('At least [number of red packets] tokens to your red packet.'),
@@ -65,17 +65,17 @@ export function useCreateCallback(redPacketSettings: RedPacketSettings) {
         })
 
         const seed = Math.random().toString()
-        const config: Tx = {
+        const request: TransactionRequest = {
             from: account,
-            to: redPacketContract.options.address,
-            value: new BigNumber(token.type === EthereumTokenType.Ether ? total : '0').toFixed(),
+            to: redPacketContract.address,
+            value: new BigNumber(token.type === EthereumTokenType.Ether ? total : '0').toString(),
         }
-        const params: Parameters<typeof redPacketContract['methods']['create_red_packet']> = [
-            Web3Utils.sha3(password)!,
+        const params: Parameters<typeof redPacketContract['create_red_packet']> = [
+            sha256(password)!,
             shares,
             isRandom,
             duration,
-            Web3Utils.sha3(seed)!,
+            sha256(seed)!,
             message,
             name,
             token.type === EthereumTokenType.Ether ? 0 : 1,
@@ -84,47 +84,52 @@ export function useCreateCallback(redPacketSettings: RedPacketSettings) {
         ]
 
         // step 1: estimate gas
-        const estimatedGas = await redPacketContract.methods
-            .create_red_packet(...params)
-            .estimateGas(config)
-            .catch((error) => {
-                setCreateState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                throw error
+        const estimatedGas = await redPacketContract.estimateGas.create_red_packet(...params).catch((error) => {
+            setCreateState({
+                type: TransactionStateType.FAILED,
+                error,
             })
+            throw error
+        })
 
         // step 2: blocking
         return new Promise<void>(async (resolve, reject) => {
-            const promiEvent = redPacketContract.methods.create_red_packet(...params).send({
-                gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
-                ...config,
-            })
-            promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
-                setCreateSettings(redPacketSettings)
-                setCreateState({
-                    type: TransactionStateType.CONFIRMED,
-                    no: 0,
-                    receipt,
-                })
-            })
-            promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
-                setCreateSettings(redPacketSettings)
-                setCreateState({
-                    type: TransactionStateType.CONFIRMED,
-                    no,
-                    receipt,
-                })
-                resolve()
-            })
-            promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
-                setCreateState({
-                    type: TransactionStateType.FAILED,
-                    error,
-                })
-                reject(error)
-            })
+            const transaction = await redPacketContract.create_red_packet(...params)
+
+            for await (const stage of Services.Ethereum.watchTransaction(account, transaction)) {
+                switch (stage.type) {
+                    case StageType.TRANSACTION_HASH:
+                        setCreateState({
+                            type: TransactionStateType.HASH,
+                            hash: stage.hash,
+                        })
+                        break
+                    case StageType.RECEIPT:
+                        setCreateSettings(redPacketSettings)
+                        setCreateState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: 0,
+                            receipt: stage.receipt,
+                        })
+                        break
+                    case StageType.CONFIRMATION:
+                        setCreateSettings(redPacketSettings)
+                        setCreateState({
+                            type: TransactionStateType.CONFIRMED,
+                            no: stage.no,
+                            receipt: stage.receipt,
+                        })
+                        resolve()
+                        break
+                    case StageType.ERROR:
+                        setCreateState({
+                            type: TransactionStateType.FAILED,
+                            error: stage.error,
+                        })
+                        reject(stage.error)
+                        break
+                }
+            }
         })
     }, [account, redPacketContract, redPacketSettings])
 

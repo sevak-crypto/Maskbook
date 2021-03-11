@@ -44,7 +44,7 @@ export function useBestTradeExactIn(
 ) {
     const chainId = useChainId()
     return useMemo(() => {
-        if (new BigNumber(amount).isGreaterThan('0') && inputToken && outputToken && pairs.length > 0)
+        if (new BigNumber(amount).gt(0) && inputToken && outputToken && pairs.length > 0)
             return (
                 Trade.bestTradeExactIn(
                     pairs,
@@ -68,7 +68,7 @@ export function useBestTradeExactOut(
 ) {
     const chainId = useChainId()
     return useMemo(() => {
-        if (new BigNumber(amount).isGreaterThan('0') && inputToken && outputToken && pairs.length > 0)
+        if (new BigNumber(amount).gt(0) && inputToken && outputToken && pairs.length > 0)
             return (
                 Trade.bestTradeExactOut(
                     pairs,

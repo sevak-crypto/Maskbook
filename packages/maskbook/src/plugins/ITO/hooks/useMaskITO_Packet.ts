@@ -10,10 +10,8 @@ export function useMaskITO_Packet() {
     return useAsyncRetry(async () => {
         if (!ITO_CONTRACT) return
         const [unlockTime, claimable = '0'] = await Promise.all([
-            ITO_CONTRACT.methods.getUnlockTime().call(),
-            ITO_CONTRACT.methods.check_claimable().call({
-                from: account,
-            }),
+            ITO_CONTRACT.getUnlockTime(),
+            ITO_CONTRACT.check_claimable(),
         ])
         return {
             unlockTime,

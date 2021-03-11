@@ -49,11 +49,8 @@ export function useTradeCallback(
                 const { methodName, args, value } = x
                 const config = !value || /^0x0*$/.test(value) ? {} : { value }
                 // @ts-ignore
-                return routerV2Contract.methods[methodName as keyof typeof routerV2Contract.methods](...args)
-                    .estimateGas({
-                        to: routerV2Contract.options.address,
-                        ...config,
-                    })
+                return routerV2Contract
+                    .estimateGas[methodName as keyof typeof routerV2Contract](...args)
                     .then(
                         (gasEstimated) =>
                             ({
@@ -95,9 +92,9 @@ export function useTradeCallback(
             const config = !value || /^0x0*$/.test(value) ? {} : { value }
 
             // @ts-ignore
-            routerV2Contract.methods[methodName as keyof typeof routerV2Contract.methods](...args).send(
+            routerV2Contract[methodName as keyof typeof routerV2Contract](...args).send(
                 {
-                    gas: addGasMargin(new BigNumber(gasEstimated)).toFixed(),
+                    gas: addGasMargin(new BigNumber(gasEstimated)).toString(),
                     ...config,
                 },
                 (error, hash) => {

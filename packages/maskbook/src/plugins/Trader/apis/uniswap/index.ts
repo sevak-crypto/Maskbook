@@ -51,8 +51,8 @@ export async function queryPairsFromSubgraph(from: string, ids: string[]) {
     const { data } = (await response.json()) as QueryPairsResponse
     return data.pairs.map((x) => ({
         id: x.id,
-        reserve0: new BigNumber(x.reserve0).multipliedBy(new BigNumber(10).pow(x.token0.decimals)).toFixed(),
-        reserve1: new BigNumber(x.reserve1).multipliedBy(new BigNumber(10).pow(x.token1.decimals)).toFixed(),
+        reserve0: new BigNumber(x.reserve0).multipliedBy(new BigNumber(10).pow(x.token0.decimals)).toString(),
+        reserve1: new BigNumber(x.reserve1).multipliedBy(new BigNumber(10).pow(x.token1.decimals)).toString(),
     }))
 }
 

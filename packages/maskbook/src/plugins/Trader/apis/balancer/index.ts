@@ -1,6 +1,6 @@
-import BigNumber from 'bignumber.js'
 import { first, memoize } from 'lodash-es'
 import { SOR } from '@balancer-labs/sor'
+import { BigNumber } from '@balancer-labs/sor/dist/utils/bignumber'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import { getChainId } from '../../../../extension/background-script/EthereumService'
 import { getConstant, isSameAddress } from '../../../../web3/helpers'

@@ -1,4 +1,4 @@
-import type BigNumber from 'bignumber.js'
+import type { BigNumber } from 'ethers'
 import { useAsyncRetry } from 'react-use'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useAirdropContract } from '../contracts/useAirdropContract'
@@ -9,8 +9,6 @@ export function useAvailability(index: string, amount: BigNumber, proof: string[
 
     return useAsyncRetry(async () => {
         if (!AirdropContract) return null
-        return AirdropContract.methods.check(index, account, amount.toFixed(), proof).call({
-            from: account,
-        })
+        return AirdropContract.check(index, account, amount.toString(), proof)
     }, [index, account, amount, proof, AirdropContract])
 }

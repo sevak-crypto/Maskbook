@@ -64,14 +64,14 @@ export function useAssetsDetailedDebank() {
                           symbol: x.symbol,
                           decimals: x.decimals,
                       },
-            balance: new BigNumber(x.balance).toFixed(),
+            balance: new BigNumber(x.balance).toString(),
             price: {
-                [CurrencyType.USD]: new BigNumber(x.price).toFixed(),
+                [CurrencyType.USD]: new BigNumber(x.price).toString(),
             },
             value: {
                 [CurrencyType.USD]: new BigNumber(x.price)
-                    .multipliedBy(new BigNumber(x.balance).dividedBy(new BigNumber(10).pow(x.decimals)))
-                    .toFixed(),
+                    .multipliedBy(new BigNumber(x.balance).div(new BigNumber(10).pow(x.decimals)))
+                    .toString(),
             },
             logoURL: x.logo_url,
         })) as AssetDetailed[]
