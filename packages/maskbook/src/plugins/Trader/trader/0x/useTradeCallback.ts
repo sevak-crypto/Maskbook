@@ -8,9 +8,8 @@ import { addGasMargin } from '../../../../web3/helpers'
 import { useAccount } from '../../../../web3/hooks/useAccount'
 import { useChainId } from '../../../../web3/hooks/useChainState'
 import { TransactionState, TransactionStateType } from '../../../../web3/hooks/useTransactionState'
-import { ChainId } from '../../../../web3/types'
+import { ChainId, StageType } from '../../../../web3/types'
 import type { SwapQuoteResponse, TradeComputed } from '../../types'
-import { StageType } from '../../../../extension/background-script/EthereumService'
 
 export function useTradeCallback(tradeComputed: TradeComputed<SwapQuoteResponse> | null) {
     const account = useAccount()

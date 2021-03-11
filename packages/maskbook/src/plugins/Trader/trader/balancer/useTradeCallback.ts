@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import type { TransactionReceipt } from 'web3-core'
 import BigNumber from 'bignumber.js'
 import { useAccount } from '../../../../web3/hooks/useAccount'
 import { useChainId } from '../../../../web3/hooks/useChainState'
@@ -11,7 +12,6 @@ import { useConstant } from '../../../../web3/hooks/useConstant'
 import { addGasMargin } from '../../../../web3/helpers'
 import { useTradeAmount } from './useTradeAmount'
 import type { TransactionRequest } from '@ethersproject/abstract-provider'
-import Services from '../../../../extension/service'
 
 export function useTradeCallback(
     trade: TradeComputed<SwapResponse> | null,
@@ -92,7 +92,7 @@ export function useTradeCallback(
 
         // step 2: blocking
         return new Promise<void>((resolve, reject) => {
-            const transaction = await Services.Ethereum tx.send({
+            const promiEvent = tx.send({
                 gas: addGasMargin(new BigNumber(estimatedGas)).toString(),
                 ...config,
             })

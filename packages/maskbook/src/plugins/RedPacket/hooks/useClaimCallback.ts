@@ -4,8 +4,8 @@ import type { TransactionRequest } from '@ethersproject/abstract-provider'
 import { useRedPacketContract } from '../contracts/useRedPacketContract'
 import { useTransactionState, TransactionStateType } from '../../../web3/hooks/useTransactionState'
 import { RedPacketRPC } from '../messages'
-import { StageType } from '../../../extension/background-script/EthereumService'
 import Services from '../../../extension/service'
+import { StageType } from '../../../web3/types'
 
 export function useClaimCallback(from: string, id?: string, password?: string) {
     const [claimState, setClaimState] = useTransactionState()

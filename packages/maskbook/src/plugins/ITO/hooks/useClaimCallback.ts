@@ -8,7 +8,7 @@ import { addGasMargin } from '../../../web3/helpers'
 import { useChainId } from '../../../web3/hooks/useChainState'
 import { useITO_Contract } from '../contracts/useITO_Contract'
 import Services from '../../../extension/service'
-import { StageType } from '../../../extension/background-script/EthereumService'
+import { StageType } from '../../../web3/types'
 
 export function useClaimCallback() {
     const account = useAccount()

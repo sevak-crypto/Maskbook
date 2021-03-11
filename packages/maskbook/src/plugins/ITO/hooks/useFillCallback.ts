@@ -7,14 +7,13 @@ import type { MaskITO } from '@dimensiondev/contracts/types/MaskITO'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useITO_Contract } from '../contracts/useITO_Contract'
-import type { EtherTokenDetailed, ERC20TokenDetailed } from '../../../web3/types'
+import { EtherTokenDetailed, ERC20TokenDetailed, StageType } from '../../../web3/types'
 import { addGasMargin } from '../../../web3/helpers'
 import { gcd, sortTokens } from '../helpers'
 import { ITO_CONSTANTS, ITO_CONTRACT_BASE_TIMESTAMP, MASK_ITO_CONTRACT_BASE_TIMESTAMP } from '../constants'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import Services from '../../../extension/service'
 import { useChainId } from '../../../web3/hooks/useChainState'
-import { StageType } from '../../../extension/background-script/EthereumService'
 
 export interface PoolSettings {
     isMask: boolean

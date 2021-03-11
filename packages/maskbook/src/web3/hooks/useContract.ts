@@ -9,7 +9,6 @@ import { nonFunctionalProvider, nonFunctionalSigner } from '../web3'
 import { TransactionEventType } from '../types'
 import type { FunctionFragment } from 'ethers/lib/utils'
 import type { TransactionRequest } from '@ethersproject/providers'
-import { StageType } from '../../extension/background-script/EthereumService'
 
 function resolveParameters(...args: any[]) {
     const lastArg = last(args)
@@ -88,19 +87,19 @@ function createContract<T extends Contract>(from: string, address: string, contr
                                     request,
                                 })
 
-                            for await (let stage of ServicesWithProgress.sendTransaction(
-                                request.from as string,
-                                request,
-                            )) {
-                                // switch (stage.type) {
-                                //     case StageType.RECEIPT:
-                                //         stage.receipt.events = decodeEvents(nonFunctionalProvider, eventABIs, stage.receipt)
-                                //         break
-                                //     case StageType.CONFIRMATION:
-                                //         stage.receipt.events = decodeEvents(nonFunctionalProvider, eventABIs, stage.receipt)
-                                //         break
-                                // }
-                            }
+                            // for await (const stage of ServicesWithProgress.sendTransaction(
+                            //     request.from as string,
+                            //     request,
+                            // )) {
+                            //     switch (stage.type) {
+                            //         case StageType.RECEIPT:
+                            //             stage.receipt.events = decodeEvents(nonFunctionalProvider, eventABIs, stage.receipt)
+                            //             break
+                            //         case StageType.CONFIRMATION:
+                            //             stage.receipt.events = decodeEvents(nonFunctionalProvider, eventABIs, stage.receipt)
+                            //             break
+                            //     }
+                            // }
                         }
                         return
                     }

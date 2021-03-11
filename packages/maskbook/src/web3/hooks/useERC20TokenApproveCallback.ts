@@ -9,9 +9,9 @@ import { useERC20TokenAllowance } from './useERC20TokenAllowance'
 import { useERC20TokenBalance } from './useERC20TokenBalance'
 import { TransactionStateType, useTransactionState } from './useTransactionState'
 import Services from '../../extension/service'
-import { StageType } from '../../extension/background-script/EthereumService'
+import { StageType } from '../types'
 
-const MaxUint256 = new BigNumber('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toHexString()
+const MaxUint256 = new BigNumber('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toFixed()
 
 export enum ApproveStateType {
     UNKNOWN,
@@ -93,16 +93,13 @@ export function useERC20TokenApproveCallback(address: string, amount?: string, s
             // step 1: estimate gas
             const estimatedGas = await erc20Contract
                 // general fallback for tokens who restrict approval amounts
+                .estimateGas
                 .approve(spender, useExact ? amount : MaxUint256)
-                .estimateGas(config)
                 .catch(() => {
                     // if the current approve strategy is failed
                     // then use oppsite strategy instead
                     useExact = !useExact
-                    return erc20Contract.approve(spender, amount).estimateGas({
-                        from: account,
-                        to: erc20Contract.options.address,
-                    })
+                    return erc20Contract.estimateGas.approve(spender, amount)
                 })
 
             // step 2: blocking

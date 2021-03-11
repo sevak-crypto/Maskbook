@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 import type { TransactionReceipt } from '@ethersproject/providers'
-import { StageType } from '../../../extension/background-script/EthereumService'
 import Services from '../../../extension/service'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
 import type { AirdropPacket } from '../apis'
 import { useAirdropContract } from '../contracts/useAirdropContract'
+import { StageType } from '../../../web3/types'
 
 export function useClaimCallback(packet?: AirdropPacket) {
     const account = useAccount()

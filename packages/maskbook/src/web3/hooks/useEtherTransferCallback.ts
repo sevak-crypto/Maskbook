@@ -10,7 +10,7 @@ import { useConstant } from './useConstant'
 import { CONSTANTS } from '../constants'
 import type { TransactionRequest } from '@ethersproject/providers'
 import { toUtf8Bytes } from 'ethers/lib/utils'
-import { StageType } from '../../extension/background-script/EthereumService'
+import { StageType } from '../types'
 
 export function useEtherTransferCallback(amount?: string, recipient?: string, memo?: string) {
     const account = useAccount()
@@ -38,7 +38,7 @@ export function useEtherTransferCallback(amount?: string, recipient?: string, me
         // error: insufficent balance
         const balance = await Services.Ethereum.getBalance(account, chainId)
 
-        if (new BigNumber(amount).isGreaterThan(new BigNumber(balance))) {
+        if (new BigNumber(amount).isGreaterThan(balance)) {
             setTransferState({
                 type: TransactionStateType.FAILED,
                 error: new Error('Insufficent balance'),
@@ -66,10 +66,9 @@ export function useEtherTransferCallback(amount?: string, recipient?: string, me
         if (memo) config.data = toUtf8Bytes(memo)
 
         // step 1: estimate gas
-        const estimatedGas = await Services.Ethereum.estimateGas(config, chainId)
         const transaction = await Services.Ethereum.sendTransaction(account, {
             // the esitmated gas limit is too low with arbitrary message to be encoded as data (increase 20% gas limit)
-            gasLimit: addGasMargin(estimatedGas, 2000).toFixed(),
+            gasLimit: addGasMargin(new BigNumber(21000), 2000).toFixed(),
             ...config,
         })
 

@@ -5,8 +5,8 @@ import { useAccount } from '../../../web3/hooks/useAccount'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
 import { useITO_Contract } from '../contracts/useITO_Contract'
 import Services from '../../../extension/service'
-import { StageType } from '../../../extension/background-script/EthereumService'
 import type { TransactionReceipt, TransactionRequest } from '@ethersproject/abstract-provider'
+import { StageType } from '../../../web3/types'
 
 export function useDestructCallback(isMask: boolean) {
     const account = useAccount()

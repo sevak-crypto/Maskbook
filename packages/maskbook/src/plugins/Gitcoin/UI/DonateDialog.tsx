@@ -121,15 +121,6 @@ export function DonateDialog(props: DonateDialogProps) {
     )
     //#endregion
 
-    //#region connect wallet
-    const [, setSelectProviderDialogOpen] = useRemoteControlledDialog(WalletMessages.events.selectProviderDialogUpdated)
-    const onConnect = useCallback(() => {
-        setSelectProviderDialogOpen({
-            open: true,
-        })
-    }, [setSelectProviderDialogOpen])
-    //#endregion
-
     //#region blocking
     const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(address ?? '', amount.toFixed(), token)
     //#endregion

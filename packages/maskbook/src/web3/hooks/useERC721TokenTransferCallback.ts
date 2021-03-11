@@ -5,7 +5,7 @@ import { TransactionStateType, useTransactionState } from './useTransactionState
 import { useERC721TokenContract } from '../contracts/useERC721TokenContract'
 import { isSameAddress } from '../helpers'
 import Services from '../../extension/service'
-import { StageType } from '../../extension/background-script/EthereumService'
+import { StageType } from '../types'
 
 export function useERC721TokenTransferCallback(address: string, tokenId?: string, recipient?: string) {
     const account = useAccount()

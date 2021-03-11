@@ -7,37 +7,11 @@ import * as MetaMask from './providers/MetaMask'
 import * as WalletConnect from './providers/WalletConnect'
 import { isSameAddress } from '../../../web3/helpers'
 import { getNonce, resetNonce, commitNonce } from './nonce'
-import { ProviderType } from '../../../web3/types'
+import { ProviderType, Stage, StageType } from '../../../web3/types'
 import { delay } from '../../../utils/utils'
 import { getTransactionReceipt } from './network'
 import { getChainId } from './chainState'
 import { currentSelectedWalletProviderSettings } from '../../../plugins/Wallet/settings'
-
-export enum StageType {
-    TRANSACTION_HASH = 0,
-    RECEIPT,
-    CONFIRMATION,
-    ERROR,
-}
-
-export type Stage =
-    | {
-          type: StageType.TRANSACTION_HASH
-          hash: string
-      }
-    | {
-          type: StageType.RECEIPT
-          receipt: TransactionReceipt
-      }
-    | {
-          type: StageType.CONFIRMATION
-          no: number
-          receipt: TransactionReceipt
-      }
-    | {
-          type: StageType.ERROR
-          error: Error
-      }
 
 //#region tracking wallets
 let wallets: WalletRecord[] = []

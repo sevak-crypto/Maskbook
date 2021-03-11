@@ -6,7 +6,7 @@ import MaskbookPluginWrapper from '../MaskbookPluginWrapper'
 import { extractTextFromTypedMessage } from '../../protocols/typed-message'
 import { usePostInfoDetails } from '../../components/DataSource/usePostInfo'
 import { GITCOIN_PLUGIN_ID } from './constants'
-import { DonateDialog } from './UI/DonateDialog'
+// import { DonateDialog } from './UI/DonateDialog'
 import { PreviewCard } from './UI/PreviewCard'
 
 const isGitcoin = (x: string): boolean => x.startsWith('https://gitcoin.co/grants')
@@ -33,14 +33,14 @@ export const GitcoinPluginDefine: PluginConfig = {
     PageComponent() {
         return (
             <>
-                <DonateDialog />
+                {/* <DonateDialog /> */}
             </>
         )
     },
     DashboardComponent() {
         return (
             <>
-                <DonateDialog />
+                {/* <DonateDialog /> */}
             </>
         )
     },

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
-import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed } from '../../../web3/types'
+import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed, StageType } from '../../../web3/types'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import { GITCOIN_CONSTANT } from '../constants'
 import { TransactionStateType, useTransactionState } from '../../../web3/hooks/useTransactionState'
@@ -8,7 +8,6 @@ import { useBulkCheckoutContract } from '../contracts/useBulkCheckoutWallet'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import type { TransactionRequest } from '@ethersproject/providers'
 import Services from '../../../extension/service'
-import { StageType } from '../../../extension/background-script/EthereumService'
 
 /**
  * A callback for donate gitcoin grant

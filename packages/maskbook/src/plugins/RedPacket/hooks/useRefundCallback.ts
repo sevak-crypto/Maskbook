@@ -3,8 +3,8 @@ import { useRedPacketContract } from '../contracts/useRedPacketContract'
 import { useTransactionState, TransactionStateType } from '../../../web3/hooks/useTransactionState'
 import Services from '../../../extension/service'
 import { useAccount } from '../../../web3/hooks/useAccount'
-import { StageType } from '../../../extension/background-script/EthereumService'
 import type { TransactionRequest } from '@ethersproject/abstract-provider'
+import { StageType } from '../../../web3/types'
 
 export function useRefundCallback(from: string, id?: string) {
     const account = useAccount()
