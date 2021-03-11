@@ -19,7 +19,7 @@ import { SelectTokenDialogEvent, WalletMessages } from '../../Wallet/messages'
 import { ITO_CONSTANTS } from '../constants'
 
 function isMoreThanMillion(allowance: string, decimals: number) {
-    return new BigNumber(allowance).gt(`100000000000e${decimals}`) // 100 billion
+    return new BigNumber(allowance).isGreaterThan(`100000000000e${decimals}`) // 100 billion
 }
 
 const useStyles = makeStyles((theme) =>

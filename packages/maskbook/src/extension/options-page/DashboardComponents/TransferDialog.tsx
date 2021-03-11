@@ -93,7 +93,7 @@ function TransferTab(props: TransferTabProps) {
     const [transferState, transferCallback, resetTransferCallback] = useTokenTransferCallback(
         token.type,
         token.address,
-        transferAmount.toString(),
+        transferAmount.toFixed(),
         address,
         memo,
     )
@@ -135,7 +135,7 @@ function TransferTab(props: TransferTabProps) {
     //#region validation
     const validationMessage = useMemo(() => {
         if (!transferAmount || new BigNumber(transferAmount).isZero()) return t('wallet_transfer_error_amount_absence')
-        if (new BigNumber(transferAmount).gt(new BigNumber(tokenBalance)))
+        if (new BigNumber(transferAmount).isGreaterThan(new BigNumber(tokenBalance)))
             return t('wallet_transfer_error_insufficent_balance', {
                 token: token.symbol,
             })

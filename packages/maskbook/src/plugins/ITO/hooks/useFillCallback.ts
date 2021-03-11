@@ -122,7 +122,7 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         }
 
         // error: limit greater than the total supply
-        if (new BigNumber(limit).gt(total)) {
+        if (new BigNumber(limit).isGreaterThan(total)) {
             setFillState({
                 type: TransactionStateType.FAILED,
                 error: new Error('Limits should less than the total supply.'),
@@ -131,7 +131,7 @@ export function useFillCallback(poolSettings?: PoolSettings) {
         }
 
         // error: exceed the max available total supply
-        if (new BigNumber(total).gt(new BigNumber('2e128'))) {
+        if (new BigNumber(total).isGreaterThan(new BigNumber('2e128'))) {
             setFillState({
                 type: TransactionStateType.FAILED,
                 error: new Error('Exceed the max available total supply'),

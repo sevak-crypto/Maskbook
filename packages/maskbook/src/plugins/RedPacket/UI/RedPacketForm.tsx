@@ -245,7 +245,7 @@ export function RedPacketForm(props: RedPacketFormProps) {
         if (!token) return t('plugin_wallet_select_a_token')
         if (!account) return t('plugin_wallet_connect_a_wallet')
         if (new BigNumber(shares || '0').isZero()) return 'Enter shares'
-        if (new BigNumber(shares || '0').gt(255)) return 'At most 255 recipients'
+        if (new BigNumber(shares || '0').isGreaterThan(255)) return 'At most 255 recipients'
     }, [account, amount, totalAmount, shares, token, tokenBalance])
 
     if (!token) return null

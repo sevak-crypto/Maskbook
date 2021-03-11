@@ -139,7 +139,11 @@ function ViewDetailed(props: ViewDetailedProps) {
                         <Typography className={classes.name} color="textPrimary" component="span">
                             {new BigNumber(
                                 formatBalance(new BigNumber(x.balance), x.token.decimals ?? 0, x.token.decimals ?? 0),
-                            ).toString()}
+                            ).toFixed(
+                                stableTokens.some((y: ERC20TokenDetailed) => isSameAddress(y.address, x.token.address))
+                                    ? 2
+                                    : 6,
+                            )}
                         </Typography>
                     </Box>,
                     <Box
@@ -148,7 +152,7 @@ function ViewDetailed(props: ViewDetailedProps) {
                             justifyContent: 'flex-end',
                         }}>
                         <Typography className={classes.price} color="textPrimary" component="span">
-                            {formatCurrency(Number(getTokenUSDValue(x).toString()), '$')}
+                            {formatCurrency(Number(getTokenUSDValue(x).toFixed(2)), '$')}
                         </Typography>
                     </Box>,
                     ...(isMobile
@@ -273,7 +277,7 @@ export function WalletAssetsTable(props: WalletAssetsTableProps) {
                         {detailedTokens
                             .filter((x) =>
                                 Number(price) !== 0
-                                    ? new BigNumber(x.value?.[CurrencyType.USD] || '0').gt(price) ||
+                                    ? new BigNumber(x.value?.[CurrencyType.USD] || '0').isGreaterThan(price) ||
                                       x.token.type === EthereumTokenType.Ether
                                     : true,
                             )
