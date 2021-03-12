@@ -29,7 +29,7 @@ import { EthereumWalletConnectedBoundary } from '../../../web3/UI/EthereumWallet
 import { EthereumERC20TokenApprovedBoundary } from '../../../web3/UI/EthereumERC20TokenApprovedBoundary'
 import { useConstant } from '../../../web3/hooks/useConstant'
 import { GITCOIN_CONSTANT } from '../constants'
-import { formatBalance } from '../../Wallet/number'
+import { formatBalance } from '../../../web3/helpers/number'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -121,9 +121,9 @@ export function DonateDialog(props: DonateDialogProps) {
     )
     //#endregion
 
-    //#region blocking
+    //#region donate
     const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(
-        address ?? '',
+        address,
         amount.toString(),
         token,
     )
@@ -135,7 +135,7 @@ export function DonateDialog(props: DonateDialogProps) {
     const shareLink = useShareLink(
         token
             ? [
-                `I just donated ${title} with ${formatBalance(amount, token.decimals)} ${cashTag}${
+                  `I just donated ${title} with ${formatBalance(amount, token.decimals)} ${cashTag}${
                       token.symbol
                   }. Follow @realMaskbook (mask.io) to donate Gitcoin grants.`,
                   '#mask_io',

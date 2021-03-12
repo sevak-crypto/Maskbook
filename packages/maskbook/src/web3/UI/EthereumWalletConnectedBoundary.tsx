@@ -31,6 +31,7 @@ export function EthereumWalletConnectedBoundary(props: EthereumWalletConnectedBo
     const chainIdValid = useChainIdValid()
     const {
         value: etherBalance = BigNumber.from(0),
+        loading: etherBalanceLoading,
         error: etherBalanceError,
         retry: retryEtherBalance,
     } = useEtherTokenBalance(account)
@@ -52,7 +53,7 @@ export function EthereumWalletConnectedBoundary(props: EthereumWalletConnectedBo
                 </ActionButton>
             </Grid>
         )
-    if (etherBalance.isZero())
+    if (etherBalance.isZero() && !etherBalanceLoading)
         return (
             <Grid container>
                 <ActionButton

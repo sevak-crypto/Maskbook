@@ -1,4 +1,4 @@
-import type { TransactionReceipt, TransactionRequest, TransactionResponse } from '@ethersproject/providers'
+import type { TransactionRequest } from '@ethersproject/providers'
 import { getWallets } from '../../../plugins/Wallet/services'
 import type { WalletRecord } from '../../../plugins/Wallet/database/types'
 import { WalletMessages } from '../../../plugins/Wallet/messages'
@@ -7,9 +7,7 @@ import * as MetaMask from './providers/MetaMask'
 import * as WalletConnect from './providers/WalletConnect'
 import { isSameAddress } from '../../../web3/helpers'
 import { getNonce, resetNonce, commitNonce } from './nonce'
-import { ProviderType, Stage, StageType } from '../../../web3/types'
-import { delay } from '../../../utils/utils'
-import { getTransactionReceipt } from './network'
+import { ProviderType } from '../../../web3/types'
 import { getChainId } from './chainState'
 import { currentSelectedWalletProviderSettings } from '../../../plugins/Wallet/settings'
 
@@ -19,65 +17,6 @@ const revalidate = async () => (wallets = await getWallets())
 WalletMessages.events.walletsUpdated.on(revalidate)
 revalidate()
 //#endregion
-
-/**
- * Polling transaction response and emit progress events manually
- * @param address
- * @param response
- */
-export async function* watchTransaction(
-    address: string,
-    response: TransactionResponse,
-): AsyncIterator<Stage, void, unknown> & {
-    [Symbol.asyncIterator](): AsyncIterator<Stage, void, unknown>
-} {
-    // add emit method
-    const { hash } = response
-
-    // transaction hash
-    yield {
-        type: StageType.TRANSACTION_HASH,
-        hash,
-    }
-
-    try {
-        for (const _ of new Array(30).fill(0)) {
-            const receipt = await getTransactionReceipt(hash, await getChainId(address))
-
-            if (!receipt) {
-                await delay(15 /* seconds */ * 1000 /* milliseconds */)
-                continue
-            }
-
-            // transation was mined
-            if (receipt.blockNumber) {
-                yield {
-                    type: StageType.CONFIRMATION,
-                    no: receipt.confirmations,
-                    receipt,
-                }
-                break
-            } else {
-                yield {
-                    type: StageType.RECEIPT,
-                    receipt,
-                }
-            }
-        }
-    } catch (error) {
-        // error: failed to get transaction receipt
-        yield {
-            type: StageType.ERROR,
-            error,
-        }
-    }
-
-    // error: timeout
-    yield {
-        type: StageType.ERROR,
-        error: new Error('Read transaction receipt timeout.'),
-    }
-}
 
 async function createTransactionCreator(from: string, request: TransactionRequest) {
     // Adding the wallet address into DB is required before sending transaction.
@@ -137,13 +76,15 @@ async function createTransactionCreator(from: string, request: TransactionReques
 export async function sendTransaction(from: string, request: TransactionRequest) {
     try {
         const creator = await createTransactionCreator(from, request)
-        return creator() as Promise<TransactionResponse>
-    } catch (err) {
-        if (err.message.includes('nonce too low')) {
+        const transaction = await creator()
+        commitNonce(from)
+        return transaction
+    } catch (error) {
+        if (error.message.includes('nonce too low')) {
             resetNonce(from)
             throw new Error('Nonce too low. Please try again.')
         }
-        throw err
+        throw error
     }
 }
 

@@ -15,7 +15,7 @@ import { SelectTokenChip, SelectTokenChipProps } from './SelectTokenChip'
 import { MIN_AMOUNT_LENGTH, MAX_AMOUNT_LENGTH } from '../constants'
 import { useStylesExtends } from '../../components/custom-ui-helper'
 import type { EtherTokenDetailed, ERC20TokenDetailed } from '../types'
-import { formatBalance } from '../../plugins/Wallet/number'
+import { formatBalance } from '../helpers/number'
 
 const useStyles = makeStyles((theme) => {
     return createStyles({
