@@ -1,7 +1,7 @@
-import type { TransactionResponse } from "@ethersproject/abstract-provider"
-import Services from "../../extension/service"
-import { delay } from "../../utils/utils"
-import { Stage, StageType } from "../types"
+import type { TransactionResponse } from '@ethersproject/abstract-provider'
+import Services from '../../extension/service'
+import { delay } from '../../utils/utils'
+import { Stage, StageType } from '../types'
 
 /**
  * Polling transaction response and emit progress events manually
@@ -25,7 +25,10 @@ export async function* watchTransaction(
 
     try {
         for (const _ of new Array(30).fill(0)) {
-            const receipt = await Services.Ethereum.getTransactionReceipt(hash, await Services.Ethereum.getChainId(address))
+            const receipt = await Services.Ethereum.getTransactionReceipt(
+                hash,
+                await Services.Ethereum.getChainId(address),
+            )
 
             if (!receipt) {
                 await delay(15 /* seconds */ * 1000 /* milliseconds */)

@@ -10,6 +10,7 @@ import { getNonce, resetNonce, commitNonce } from './nonce'
 import { ProviderType } from '../../../web3/types'
 import { getChainId } from './chainState'
 import { currentSelectedWalletProviderSettings } from '../../../plugins/Wallet/settings'
+import { unreachable } from '../../../utils/utils'
 
 //#region tracking wallets
 let wallets: WalletRecord[] = []
@@ -49,22 +50,29 @@ async function createTransactionCreator(from: string, request: TransactionReques
                 }),
             request.gasPrice ?? signer.getGasPrice(),
         ] as const)
-        return () =>
-            signer.sendTransaction({
+
+        console.log({
+            nonce,
+            gasLimit,
+            gasPrice,
+        })
+
+        return () => {
+            const signer.sendTransaction({
                 from,
                 nonce,
                 gasLimit,
                 gasPrice,
                 ...request,
             })
+        }
     }
-
     if (provider === ProviderType.MetaMask) {
         const signer = await MetaMask.createSigner()
         return () => signer.sendTransaction(request)
     }
     if (provider === ProviderType.WalletConnect) return () => WalletConnect.createSigner().sendTransaction(request)
-    throw new Error(`cannot send transaction for wallet ${wallet.address}`)
+    unreachable(provider)
 }
 
 /**

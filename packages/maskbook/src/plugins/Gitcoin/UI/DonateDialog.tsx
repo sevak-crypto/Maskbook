@@ -122,11 +122,7 @@ export function DonateDialog(props: DonateDialogProps) {
     //#endregion
 
     //#region donate
-    const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(
-        address,
-        amount.toString(),
-        token,
-    )
+    const [donateState, donateCallback, resetDonateCallback] = useDonateCallback(address, amount.toString(), token)
     //#endregion
 
     //#region transaction dialog

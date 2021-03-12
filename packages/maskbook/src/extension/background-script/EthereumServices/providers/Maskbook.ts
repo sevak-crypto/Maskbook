@@ -7,8 +7,7 @@ import { CONSTANTS } from '../../../../web3/constants'
 export function createSigner(key: string, chainId = currentMaskbookChainIdSettings.value, url?: string) {
     const provider = createProvider(chainId, url)
     const signer = new Wallet(key)
-    signer.connect(provider)
-    return signer
+    return signer.connect(provider)
 }
 
 // 5 is the length of weights

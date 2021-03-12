@@ -37,7 +37,7 @@ export function useDonateCallback(address: string, amount: string, token?: Ether
                 amount: grantAmount.toString(),
                 dest: address,
             },
-        ].filter(x => x.amount !== '0')
+        ].filter((x) => x.amount !== '0')
     }, [address, amount, token])
 
     const donateCallback = useCallback(async () => {
