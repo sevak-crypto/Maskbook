@@ -175,9 +175,6 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
                     </IconButton>
                 </Box>
             </Box>
-
-            {menu}
-
             <Box className={classes.content}>
                 {tabIndex === 0 ? (
                     <WalletAssetsTable classes={{ container: classes.assetsTable }} wallet={wallet} />
@@ -185,6 +182,7 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
                 {tabIndex === 1 ? <CollectibleList wallet={wallet} /> : null}
                 {tabIndex === 2 ? <TransactionList /> : null}
             </Box>
+            {menu}
             {addToken}
             {walletBackup}
             {walletDelete}
