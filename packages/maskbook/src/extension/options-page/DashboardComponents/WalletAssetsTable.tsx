@@ -165,12 +165,12 @@ export function WalletAssetsTable(props: WalletAssetsTableProps) {
         subscribeFromZerion(addressSocket, {
             scope: ['transactions'],
             payload: {
-                address: "0x0d09dc9a840b1b4ea25194998fd90bb50fc2008a",
-                currency: "usd",
+                address: '0x0d09dc9a840b1b4ea25194998fd90bb50fc2008a',
+                currency: 'usd',
                 transactions_limit: 30,
                 transactions_offset: 0,
-                transactions_search_query: "",
-            }
+                transactions_search_query: '',
+            },
         }).then((response: any) => {
             console.log(response)
         })
