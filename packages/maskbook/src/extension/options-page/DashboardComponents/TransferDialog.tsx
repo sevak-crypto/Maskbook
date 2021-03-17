@@ -2,17 +2,7 @@ import { ChangeEvent, useMemo, useState, useCallback, useEffect } from 'react'
 import { Send as SendIcon } from 'react-feather'
 import { BigNumber } from 'bignumber.js'
 import { EthereumAddress } from 'wallet.ts'
-import {
-    Box,
-    Button,
-    createStyles,
-    IconButton,
-    InputAdornment,
-    makeStyles,
-    TextField,
-    Theme,
-    Typography,
-} from '@material-ui/core'
+import { Button, createStyles, IconButton, InputAdornment, makeStyles, TextField, Theme } from '@material-ui/core'
 import type { WalletRecord } from '../../../plugins/Wallet/database/types'
 import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed } from '../../../web3/types'
 import {

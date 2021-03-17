@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
     },
     card: {
+        position: 'relative',
         padding: theme.spacing(1),
     },
     description: {
@@ -73,7 +74,13 @@ export function CollectibleList() {
         <Box className={classes.root}>
             {collectibles.map((x) => (
                 <div className={classes.card} key={x.id}>
-                    <CollectibleCard key={x.id} name={x.name} description={x.description} url={x.image_url ?? x.image_preview_url ?? ''} link={x.permalink} />
+                    <CollectibleCard
+                        key={x.id}
+                        name={x.name}
+                        description={x.description}
+                        url={x.image_url ?? x.image_preview_url ?? ''}
+                        link={x.permalink}
+                    />
                     <div className={classes.description}>
                         <Typography color="textSecondary" variant="body2">
                             {x.name ?? x.collection.slug}

@@ -1,8 +1,8 @@
 import { Card, createStyles, IconButton, Link, makeStyles, MenuItem } from '@material-ui/core'
-import ImageIcon from '@material-ui/icons/Image'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { useCallback } from 'react'
 import { Image } from '../../../../components/shared/Image'
+import { MaskbookIconOutlined } from '../../../../resources/MaskbookIcon'
 import { useMenu } from '../../../../utils/hooks/useMenu'
 import { useI18N } from '../../../../utils/i18n-next-ui'
 import { useModal } from '../../DashboardDialogs/Base'
@@ -25,6 +25,11 @@ const useStyles = makeStyles((theme) =>
             position: 'absolute',
             zIndex: 1,
             backgroundColor: `${theme.palette.background.paper} !important`,
+        },
+        placeholder: {
+            width: 64,
+            height: 64,
+            opacity: 0.1,
         },
     }),
 )
@@ -86,7 +91,17 @@ export function CollectibleCard(props: CollectibleCardProps) {
                     <IconButton className={classes.icon} size="small" onClick={onClickMore}>
                         <MoreVertIcon />
                     </IconButton>
-                    {props.url ? <Image component="img" width={160} height={220} src={props.url} /> : <ImageIcon />}
+                    {props.url ? (
+                        <Image
+                            component="img"
+                            width={160}
+                            height={220}
+                            style={{ objectFit: 'contain' }}
+                            src={props.url}
+                        />
+                    ) : (
+                        <MaskbookIconOutlined className={classes.placeholder} />
+                    )}
                 </Card>
             </Link>
             {menu}
