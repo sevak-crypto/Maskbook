@@ -15,6 +15,7 @@ import {
     Theme,
     Typography,
 } from '@material-ui/core'
+import io from 'socket.io-client'
 import BigNumber from 'bignumber.js'
 import classNames from 'classnames'
 import { useStylesExtends } from '../../../components/custom-ui-helper'
@@ -25,7 +26,7 @@ import { getTokenUSDValue, isSameAddress } from '../../../web3/helpers'
 import { TokenIcon } from './TokenIcon'
 import type { WalletRecord } from '../../../plugins/Wallet/database/types'
 import { ERC20TokenActionsBar } from './ERC20TokenActionsBar'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { DashboardWalletsContext } from '../DashboardRouters/Wallets'
 import ExpandLessIcon from '@material-ui/icons/ExpandLess'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -77,6 +78,55 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
 }))
 
+function verify(request: any, response: any) {
+    // each value in request payload must be found in response meta
+    return Object.keys(request.payload).every((key) => {
+        const requestValue = request.payload[key]
+        const responseMetaValue = response.meta[key]
+        if (typeof requestValue === 'object') {
+            return JSON.stringify(requestValue) === JSON.stringify(responseMetaValue)
+        }
+        return responseMetaValue === requestValue
+    })
+}
+
+const addressSocket = {
+    namespace: 'address',
+    socket: io('wss://api-v4.zerion.io/address', {
+        transports: ['websocket'],
+        timeout: 60000,
+        query: {
+            api_token: 'Zerion.oSQAHALTonDN9HYZiYSX5k6vnm4GZNcM',
+        },
+    }),
+}
+
+type SocketNameSpace = {
+    namespace: string
+    socket: SocketIOClient.Socket
+}
+
+type SocketRequestBody = {
+    scope: [string]
+    payload: {
+        [key: string]: any
+    }
+}
+
+function subscribeFromZerion(socketNamespace: SocketNameSpace, requestBody: SocketRequestBody) {
+    return new Promise((resolve) => {
+        const { socket, namespace } = socketNamespace
+        function handleReceive(data: any) {
+            if (verify(requestBody, data)) {
+                resolve(data)
+            }
+        }
+        const model = requestBody.scope[0]
+        socket.emit('subscribe', requestBody)
+        socket.on(`received ${namespace} ${model}`, handleReceive)
+    })
+}
+
 export interface WalletAssetsTableProps extends withClasses<KeysInferFromUseStyles<typeof useStyles>> {
     wallet: WalletRecord
 }
@@ -98,6 +148,33 @@ export function WalletAssetsTable(props: WalletAssetsTableProps) {
     const [viewLength, setViewLength] = useState(MAX_TOKENS_LENGTH)
     const [more, setMore] = useState(false)
     const [price, setPrice] = useState(MIN_VALUE)
+
+    useEffect(() => {
+        // subscribe assets
+        subscribeFromZerion(addressSocket, {
+            scope: ['assets'],
+            payload: {
+                address: '0x0d09dc9a840b1b4ea25194998fd90bb50fc2008a',
+                currency: 'usd',
+            },
+        }).then((response: any) => {
+            console.log(response)
+        })
+
+        // subscribe transactions
+        subscribeFromZerion(addressSocket, {
+            scope: ['transactions'],
+            payload: {
+                address: "0x0d09dc9a840b1b4ea25194998fd90bb50fc2008a",
+                currency: "usd",
+                transactions_limit: 30,
+                transactions_offset: 0,
+                transactions_search_query: "",
+            }
+        }).then((response: any) => {
+            console.log(response)
+        })
+    }, [])
 
     if (detailedTokensError)
         return (
