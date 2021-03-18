@@ -20,9 +20,9 @@ import { WalletAssetsTable } from './WalletAssetsTable'
 import { useRemoteControlledDialog } from '../../../utils/hooks/useRemoteControlledDialog'
 import { PluginTransakMessages } from '../../../plugins/Transak/messages'
 import { Flags } from '../../../utils/flags'
-import { ElectionTokenAlbum } from '../../../plugins/Election2020/UI/ElectionTokenAlbum'
-import { TokenAlbum as COTM_TokenAlbum } from '../../../plugins/COTM/UI/TokenAlbum'
 import { useChainIdValid } from '../../../web3/hooks/useChainState'
+import { TransactionList } from './TransactionList'
+import { CollectibleList } from './CollectibleList'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -132,6 +132,7 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(({ w
                         onChange={onTabChange}>
                         <Tab label={t('dashboard_tab_token')}></Tab>
                         <Tab label={t('dashboard_tab_collectibles')}></Tab>
+                        <Tab label={t('dashboard_tab_transactions')}></Tab>
                     </Tabs>
                 </Box>
 
@@ -178,8 +179,8 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(({ w
                 {tabIndex === 0 ? (
                     <WalletAssetsTable classes={{ container: classes.assetsTable }} wallet={wallet} />
                 ) : null}
-                {Flags.COTM_enabled && tabIndex === 1 ? <COTM_TokenAlbum /> : null}
-                {Flags.election2020_enabled && tabIndex === 1 ? <ElectionTokenAlbum /> : null}
+                {tabIndex === 1 ? <CollectibleList /> : null}
+                {tabIndex === 2 ? <TransactionList /> : null}
             </Box>
             {addToken}
             {walletBackup}
