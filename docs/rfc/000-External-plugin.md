@@ -10,9 +10,12 @@
 
 An external plugin should be an isolated web site, which means it should not be loaded / installed to the Mask Network.
 
-When Mask Network found a metadata of an external plugin, it will try to fetch the manifest and display the content in the payload. This process **must not** involves dynamic code execution.
+When Mask Network found a metadata of an external plugin,
+it will try to fetch the manifest and display the content in the payload.
+This process **must not** involves dynamic code execution.
 
-When the user decided to interact with the external plugin, Mask Network will open a new popup window and inject some API to it.
+When the user decided to interact with the external plugin,
+Mask Network will open a new popup window and inject some API to it.
 
 It is the same when user want to use the external plugin when composing.
 
@@ -32,7 +35,8 @@ It is the same when user want to use the external plugin when composing.
 
 After decided the plugin to use, the user clicked on the plugin entry.
 A popup window appears.
-If Mask Network has no permission to the plugin site, Mask Network will jump to a permission granting page first.
+If Mask Network has no permission to the plugin site,
+Mask Network will jump to a permission granting page first.
 
 After permissions got, the plugin page will reveal.
 
@@ -47,7 +51,8 @@ User see the plugin UI rendered by the Mask Network.
 User click to interact with the plugin.
 
 A popup window appears.
-If Mask Network has no permission to the plugin site, Mask Network will jump to a permission granting page first.
+If Mask Network has no permission to the plugin site,
+Mask Network will jump to a permission granting page first.
 After permissions got, the plugin page will reveal.
 
 User interact with the plugin.
@@ -58,7 +63,9 @@ User interact with the plugin.
 
 A plugin should be deployed on a stable HTTPs URL, for example <https://example.com/my-plugin>, let's call it _base url_.
 
-It should provide a manifest file called "mask-plugin-manifest.json", for the example above, it should be located at <https://example.com/my-plugin/mask-plugin-manifest.json>. It should be JSONC (JSON with comment) format.
+It should provide a manifest file called "mask-plugin-manifest.json", for the example above,
+it should be located at <https://example.com/my-plugin/mask-plugin-manifest.json>.
+It should be JSONC (JSON with comment) format.
 
 The manifest file should match the following shape:
 
@@ -73,7 +80,9 @@ interface ExternalPluginManifestFile {
   i18n?: Record<Language, URL>
   payload_preview?: Record<PayloadMetadataKey, SupportedPayloadPreviews>
 }
+
 type KnownPayloadTemplates = 'Card_1'
+
 interface SupportedPayloadPreviews extends Record<KnownPayloadTemplates, URL> {
   prefer?: KnownPayloadTemplates
 }
@@ -170,6 +179,6 @@ Mask.setMetadata('kind1:1', {
 })
 ```
 
-#### Mask.permission.query/request/revoke
+#### Mask.permission.{query,request,revoke}
 
 Manage permissions
