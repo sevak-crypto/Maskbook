@@ -112,7 +112,7 @@ export interface Asset {
 export interface AssetInCard {
     asset_contract: {
         address: string
-        schema_name: "ERC721" | "ERC1155"
+        schema_name: 'ERC721' | 'ERC1155'
         symbol: string
     }
     token_id: string
