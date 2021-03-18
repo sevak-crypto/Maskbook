@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useState } from 'react'
+import { pick } from 'lodash-es'
 import { Button, Box, IconButton, MenuItem, Tabs, Tab, Alert } from '@material-ui/core'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import AddIcon from '@material-ui/icons/Add'
@@ -7,6 +8,7 @@ import MoreVertOutlinedIcon from '@material-ui/icons/MoreVertOutlined'
 import { useModal } from '../DashboardDialogs/Base'
 import {
     DashboardWalletAddERC20TokenDialog,
+    DashboardWalletAddERC721TokenDialog,
     DashboardWalletBackupDialog,
     DashboardWalletDeleteConfirmDialog,
     DashboardWalletRenameDialog,
@@ -23,6 +25,10 @@ import { Flags } from '../../../utils/flags'
 import { useChainIdValid } from '../../../web3/hooks/useChainState'
 import { TransactionList } from './TransactionList'
 import { CollectibleList } from './CollectibleList'
+import { useAccount } from '../../../web3/hooks/useAccount'
+import { useCollectibles } from '../../../plugins/Wallet/hooks/useCollectibles'
+import { AssetProvider } from '../../../plugins/Wallet/types'
+import type { AssetInCard } from '../../../plugins/Wallet/apis/opensea'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -76,6 +82,7 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
     ref,
 ) {
     const classes = useStyles()
+    const account = useAccount()
     const { t } = useI18N()
     const color = useColorStyles()
     const xsMatched = useMatchXS()
@@ -84,7 +91,16 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
     const [walletBackup, , openWalletBackup] = useModal(DashboardWalletBackupDialog)
     const [walletDelete, , openWalletDelete] = useModal(DashboardWalletDeleteConfirmDialog)
     const [walletRename, , openWalletRename] = useModal(DashboardWalletRenameDialog)
+    const [addAsset, , openAddAsset] = useModal(DashboardWalletAddERC721TokenDialog)
 
+    const {
+        value: collectibles = [],
+        loading: collectiblesLoading,
+        error: collectiblesError,
+        retry: collectiblesRetry,
+    } = useCollectibles(account, AssetProvider.OPENSEAN)
+
+    const [addedAssets, setAddedAssets] = useState<AssetInCard[]>([])
     const [menu, openMenu] = useMenu(
         <MenuItem onClick={() => openWalletRename({ wallet })}>{t('rename')}</MenuItem>,
         wallet._private_key_ || wallet.mnemonic.length ? (
@@ -152,6 +168,26 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
                             {t('add_token')}
                         </Button>
                     ) : null}
+                    {!xsMatched && tabIndex === 1 ? (
+                        <Button
+                            className={classes.addButton}
+                            variant="text"
+                            onClick={() =>
+                                openAddAsset({
+                                    wallet,
+                                    tokenIdsLoaded: collectibles
+                                        .map((x) => x.token_id)
+                                        .concat(addedAssets.map((x) => x.token_id)),
+                                    setAddedAssets: (assetInCard: AssetInCard) => {
+                                        console.log('assetInCard', assetInCard)
+                                        setAddedAssets([assetInCard, ...addedAssets])
+                                    },
+                                })
+                            }
+                            startIcon={<AddIcon />}>
+                            {t('add_asset')}
+                        </Button>
+                    ) : null}
                     {!xsMatched && Flags.transak_enabled ? (
                         <Button
                             onClick={() => {
@@ -177,11 +213,35 @@ export const WalletContent = forwardRef<HTMLDivElement, WalletContentProps>(func
                 {tabIndex === 0 ? (
                     <WalletAssetsTable classes={{ container: classes.assetsTable }} wallet={wallet} />
                 ) : null}
-                {tabIndex === 1 ? <CollectibleList wallet={wallet} /> : null}
+                {tabIndex === 1 ? (
+                    <CollectibleList
+                        wallet={wallet}
+                        collectibles={collectibles
+                            .map(
+                                (x) =>
+                                    ({
+                                        asset_contract: {
+                                            address: x.asset_contract.address,
+                                            symbol: x.asset_contract.symbol,
+                                            schema_name: x.asset_contract.schema_name,
+                                        },
+                                        token_id: x.token_id,
+                                        name: x.name ?? x.collection.slug,
+                                        image: x.image_url ?? x.image_preview_url ?? '',
+                                        permalink: x.permalink,
+                                    } as AssetInCard),
+                            )
+                            .concat(addedAssets)}
+                        collectiblesLoading={collectiblesLoading}
+                        collectiblesError={collectiblesError}
+                        collectiblesRetry={collectiblesRetry}
+                    />
+                ) : null}
                 {tabIndex === 2 ? <TransactionList /> : null}
             </Box>
             {menu}
             {addToken}
+            {addAsset}
             {walletBackup}
             {walletDelete}
             {walletRename}
