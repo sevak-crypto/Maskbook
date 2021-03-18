@@ -3,20 +3,23 @@ import { useTokensBalance } from './useTokensBalance'
 import { useAssetsDetailedMerged } from './useAssetsDetailedMerged'
 
 export function useAssetsDetailedChain(tokens: (EtherTokenDetailed | ERC20TokenDetailed)[]) {
-    const { value: listOfBalance = [], retry } = useTokensBalance(tokens.map((y) => y.address))
+    const { value: listOfBalance = [], loading, error, retry } = useTokensBalance(tokens.map((y) => y.address))
     return {
         value: useAssetsDetailedMerged(
             // the length not matched in case of error occurs
             listOfBalance.length === tokens.length
                 ? listOfBalance.map(
-                      (balance, idx) =>
+                      (balance: string, idx: number) =>
                           ({
+                              chain: 'eth',
                               token: tokens[idx],
                               balance,
                           } as AssetDetailed),
                   )
                 : [],
         ),
+        loading,
+        error,
         retry,
     }
 }

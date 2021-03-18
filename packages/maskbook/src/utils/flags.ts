@@ -18,7 +18,6 @@ export const Flags = {
     has_no_browser_tab_ui: appOnly,
     has_no_connected_user_link: appOnly,
     has_native_nav_bar: appOnly,
-    inject_search_prediction_box: webOnly,
     /** In E2E, prefer open shadow root so we can test it. */
     using_ShadowDOM_attach_mode: process.env.target === 'E2E' ? 'open' : 'closed',
     /** Don't inject injected script in this mode. Native side will do the job. */
@@ -27,14 +26,13 @@ export const Flags = {
     has_native_welcome_ui: appOnly,
     /** Firefox has a special API that can inject to the document with a higher permission. */
     requires_injected_script_run_directly: process.env.target === 'firefox',
-    // TODO: document why it enabled on app
-    support_eth_network_switch: appOnly || betaOrInsiderOnly,
+    support_eth_network_switch: betaOrInsiderOnly,
     //#region Experimental features
     image_payload_marked_as_beta: appOnly,
     /** Prohibit the use of test networks in production */
     wallet_network_strict_mode_enabled: process.env.NODE_ENV === 'production' && !betaOrInsiderOnly,
     transak_enabled: webOnly,
-    trader_enabled: webOnly,
+    trader_enabled: true,
     trader_zrx_enabled: webOnly,
     trader_all_api_cached_enabled: devOnly,
     gitcoin_enabled: webOnly,
@@ -43,13 +41,20 @@ export const Flags = {
     election2020_composition_dialog_enabled: false,
     COTM_enabled: webOnly,
     COTM_composition_dialog_enabled: false,
+    mask_ito_enabled: betaOrInsiderOnly,
+    airdrop_enabled: webOnly,
+    airdrop_composition_dialog_enabled: false,
     metamask_support_enabled: webOnly,
+    toolbar_enabled: webOnly,
+    /* construct LBP for all ERC20 tokens */
+    LBP_enabled: false,
+    LBP_whitelist_enabled: process.env.NODE_ENV === 'production',
     //#endregion
 
     //#region Functionality missing / broken
     /**
      * - iOS: WebExtension polyfill didn't implemented the dynamic permission API
-     * - E2E: Cannot click the "allow" button (maybe a Puppeteer bug) in the Puppeteer (maybe a bug)
+     * - E2E: Cannot click the "allow" button (maybe a bug) in the Puppeteer
      */
     no_web_extension_dynamic_permission_request: is_iOSApp || process.env.target === 'E2E',
     has_no_WebRTC: process.env.target === 'safari' || !globalThis?.navigator?.permissions?.query,

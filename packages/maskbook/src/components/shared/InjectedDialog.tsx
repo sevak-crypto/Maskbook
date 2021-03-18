@@ -16,9 +16,10 @@ import {
 import { Children, cloneElement } from 'react'
 import { useI18N } from '../../utils/i18n-next-ui'
 import { usePortalShadowRoot } from '../../utils/shadow-root/usePortalShadowRoot'
-import { getCustomUIOverwrite, mergeClasses, useStylesExtends } from '../custom-ui-helper'
+import { mergeClasses, useStylesExtends } from '../custom-ui-helper'
 import { DialogDismissIconUI } from '../InjectedComponents/DialogDismissIcon'
 import { ErrorBoundary } from '@dimensiondev/maskbook-theme'
+import { activatedSocialNetworkUI } from '../../social-network'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -47,10 +48,11 @@ export interface InjectedDialogProps extends withClasses<InjectedDialogClassKey>
     title?: React.ReactChild
     DialogProps?: Partial<DialogProps>
     disableBackdropClick?: boolean
+    disableArrowBack?: boolean
 }
 export function InjectedDialog(props: InjectedDialogProps) {
     const classes = useStyles()
-    const overwrite = getCustomUIOverwrite()
+    const overwrite = activatedSocialNetworkUI.customization.componentOverwrite || {}
     props = overwrite.InjectedDialog?.props?.(props) ?? props
     const {
         dialogActions,
@@ -96,7 +98,7 @@ export function InjectedDialog(props: InjectedDialogProps) {
                             classes={{ root: dialogCloseButton }}
                             aria-label={t('post_dialog__dismiss_aria')}
                             onClick={props.onClose}>
-                            <DialogDismissIconUI />
+                            <DialogDismissIconUI disableArrowBack={props.disableArrowBack} />
                         </IconButton>
                         <Typography className={dialogTitleTypography} display="inline" variant="inherit">
                             {props.title}

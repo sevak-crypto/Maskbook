@@ -30,7 +30,7 @@ import ShowcaseBox from '../DashboardComponents/ShowcaseBox'
 import type { RedPacketJSONPayload } from '../../../plugins/RedPacket/types'
 import useQueryParams from '../../../utils/hooks/useQueryParams'
 import { DashboardRoute } from '../Route'
-import { sleep, checkInputLengthExceed } from '../../../utils/utils'
+import { delay, checkInputLengthExceed } from '../../../utils/utils'
 import { WALLET_OR_PERSONA_NAME_MAX_LEN } from '../../../utils/constants'
 import type { WalletRecord } from '../../../plugins/Wallet/database/types'
 import { ERC20TokenDetailed, EthereumTokenType, EtherTokenDetailed } from '../../../web3/types'
@@ -92,7 +92,7 @@ export function ERC20PredefinedTokenSelector(props: ERC20PredefinedTokenSelector
             <FixedTokenList
                 classes={{ list: classes.list, placeholder: classes.placeholder }}
                 keyword={keyword}
-                excludeTokens={excludeTokens}
+                blacklist={excludeTokens}
                 onSubmit={(token) => token.type === EthereumTokenType.ERC20 && onTokenChange?.(token)}
                 FixedSizeListProps={{
                     height: 192,
@@ -106,7 +106,7 @@ export function ERC20PredefinedTokenSelector(props: ERC20PredefinedTokenSelector
 //#endregion
 
 //#region wallet import dialog
-interface WalletProps {
+export interface WalletProps {
     wallet: WalletRecord
 }
 
@@ -330,7 +330,7 @@ export function DashboardWalletCreateDialog(props: WrappedDialogProps<object>) {
                                 !(state[0] === 2 && name && privKey)) ||
                             checkInputLengthExceed(name)
                         }>
-                        {t('import')}
+                        {t('create')}
                     </DebounceButton>
                 }
             />
@@ -576,7 +576,7 @@ export function DashboardWalletErrorDialog(props: WrappedDialogProps<object>) {
     const onClose = async () => {
         props.onClose()
         // prevent UI updating before dialog disappearing
-        await sleep(300)
+        await delay(300)
         history.replace(DashboardRoute.Wallets)
     }
 

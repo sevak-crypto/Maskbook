@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname $0)/_/husky.sh"
 
-lint-staged
-npm run locale-kit -- --sync-key
-prettier --check .
+npx lint-staged

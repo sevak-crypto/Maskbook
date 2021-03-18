@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { DialogContent } from '@material-ui/core'
 import AbstractTab, { AbstractTabProps } from '../../../extension/options-page/DashboardComponents/AbstractTab'
 import type { RedPacketJSONPayload } from '../types'
-import { editActivatedPostMetadata } from '../../../social-network/ui'
+import { editActivatedPostMetadata } from '../../../protocols/typed-message/global-state'
 import { RedPacketMetaKey } from '../constants'
 import { useI18N } from '../../../utils/i18n-next-ui'
 import { RedPacketForm } from './RedPacketForm'
@@ -55,7 +55,7 @@ export default function RedPacketDialog(props: RedPacketDialogProps) {
     return (
         <InjectedDialog open={props.open} title={t('plugin_red_packet_display_name')} onClose={props.onClose}>
             <DialogContent>
-                <AbstractTab height={362} {...tabProps} />
+                <AbstractTab height={300} {...tabProps} />
             </DialogContent>
         </InjectedDialog>
     )

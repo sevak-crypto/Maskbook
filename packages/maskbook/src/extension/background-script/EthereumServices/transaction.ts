@@ -12,7 +12,7 @@ import { isSameAddress } from '../../../web3/helpers'
 import { getNonce, resetNonce, commitNonce } from './nonce'
 import { TransactionEventType } from '../../../web3/types'
 import { ProviderType } from '../../../web3/types'
-import { sleep } from '../../../utils/utils'
+import { delay } from '../../../utils/utils'
 import { getTransactionReceipt } from './network'
 import { getChainId } from './chainState'
 import { currentSelectedWalletProviderSettings } from '../../../plugins/Wallet/settings'
@@ -48,7 +48,7 @@ function watchTransactionEvent(from: string, event: PromiEventW3<TransactionRece
                 break
             }
             // wait for next block
-            await sleep(15 /* seconds */ * 1000 /* milliseconds */)
+            await delay(15 /* seconds */ * 1000 /* milliseconds */)
         }
         // timeout
         if (!controller.signal.aborted) enhancedEvent.emit(TransactionEventType.ERROR, new Error('timeout'))
@@ -77,7 +77,14 @@ async function createTransactionEventCreator(from: string, config: TransactionCo
     if (provider === ProviderType.Maskbook) {
         const privateKey = wallet._private_key_
         if (!privateKey) throw new Error(`cannot find private key for wallet ${wallet.address}`)
-        const web3 = Maskbook.createWeb3(await getChainId(from), [privateKey])
+
+        // FIXME:
+        // __provider_url__ only used by useEtherTransferCallback
+        const web3 = Maskbook.createWeb3(
+            await getChainId(from),
+            [privateKey],
+            (config as { __provider_url__?: string }).__provider_url__,
+        )
         const [nonce, gas, gasPrice] = await Promise.all([
             config.nonce ?? getNonce(from),
             config.gas ??
@@ -113,8 +120,8 @@ async function createTransactionEventCreator(from: string, config: TransactionCo
  */
 export async function* sendTransaction(from: string, config: TransactionConfig) {
     try {
-        const createTransactionEvent = await createTransactionEventCreator(from, config)
-        const watchedTransactionEvent = watchTransactionEvent(from, createTransactionEvent())
+        const transactionEventCreator = await createTransactionEventCreator(from, config)
+        const watchedTransactionEvent = watchTransactionEvent(from, transactionEventCreator())
         for await (const stage of promiEventToIterator(watchedTransactionEvent)) {
             // advance the nonce if tx comes out
             if (stage.type === StageType.TRANSACTION_HASH) await commitNonce(from)
@@ -124,7 +131,10 @@ export async function* sendTransaction(from: string, config: TransactionConfig) 
         }
         return
     } catch (err) {
-        if (err.message.includes('nonce too low')) resetNonce(from)
+        if (err.message.includes('nonce too low')) {
+            resetNonce(from)
+            throw new Error('Nonce too low. Please try again.')
+        }
         throw err
     }
 }

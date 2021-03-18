@@ -9,6 +9,7 @@ import {
     PRICE_IMPACT_NON_EXPERT_BLOCKED,
     PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN,
 } from './constants'
+import type { ERC20TokenDetailed, EtherTokenDetailed } from '../../web3/types'
 
 export function resolveCurrencyName(currency: Currency) {
     return [
@@ -24,8 +25,8 @@ export function resolveDataProviderName(dataProvider: DataProvider) {
             return 'CoinGecko'
         case DataProvider.COIN_MARKET_CAP:
             return 'CoinMarketCap'
-        case DataProvider.UNISWAP:
-            return 'Uniswap'
+        case DataProvider.UNISWAP_INFO:
+            return 'Uniswap Info'
         default:
             unreachable(dataProvider)
     }
@@ -37,8 +38,8 @@ export function resolveDataProviderLink(dataProvider: DataProvider) {
             return 'https://www.coingecko.com/'
         case DataProvider.COIN_MARKET_CAP:
             return 'https://coinmarketcap.com/'
-        case DataProvider.UNISWAP:
-            return 'https://uniswap.org/'
+        case DataProvider.UNISWAP_INFO:
+            return 'https://info.uniswap.org/'
         default:
             unreachable(dataProvider)
     }
@@ -52,6 +53,10 @@ export function resolveTradeProviderName(tradeProvider: TradeProvider) {
             return '0x'
         case TradeProvider.SUSHISWAP:
             return 'SushiSwap'
+        case TradeProvider.SASHIMISWAP:
+            return 'SashimiSwap'
+        case TradeProvider.BALANCER:
+            return 'Balancer'
         default:
             unreachable(tradeProvider)
     }
@@ -65,6 +70,10 @@ export function resolveTradeProviderLink(tradeProvider: TradeProvider) {
             return 'https://0x.org/'
         case TradeProvider.SUSHISWAP:
             return 'https://sushiswapclassic.org/'
+        case TradeProvider.SASHIMISWAP:
+            return 'https://sashimi.cool/'
+        case TradeProvider.BALANCER:
+            return 'https://balancer.exchange/'
         default:
             unreachable(tradeProvider)
     }
@@ -78,6 +87,10 @@ export function resolveTradePairLink(tradeProvider: TradeProvider, address: stri
             return ''
         case TradeProvider.SUSHISWAP:
             return `https://analytics.sushiswap.fi/pairs/${address}`
+        case TradeProvider.SASHIMISWAP:
+            return `https://info.sashimi.cool/pair/${address}`
+        case TradeProvider.BALANCER:
+            return `https://pools.balancer.exchange/#/pool/${address}/`
         default:
             unreachable(tradeProvider)
     }

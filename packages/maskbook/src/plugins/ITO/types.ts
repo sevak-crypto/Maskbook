@@ -23,6 +23,8 @@ export interface JSON_PayloadInMask {
     token: EtherTokenDetailed | ERC20TokenDetailed
     exchange_amounts: string[]
     exchange_tokens: (EtherTokenDetailed | ERC20TokenDetailed)[]
+    is_mask?: boolean
+    test_nums?: number[]
 }
 
 type TokenOutMask = Omit<JSON_PayloadInMask['token'], 'chainId'> & {
@@ -35,7 +37,6 @@ export interface JSON_PayloadOutMask extends Omit<JSON_PayloadInMask, 'token' | 
 }
 
 export enum ITO_Status {
-    completed = 'completed',
     waited = 'waited',
     started = 'started',
     expired = 'expired',
@@ -53,4 +54,9 @@ export interface PoolRecord {
 export interface PoolRecordInDatabase extends PoolRecord {
     /** An unique record type in DB */
     type: 'ito-pool'
+}
+
+export enum DialogTabs {
+    create = 0,
+    past = 1,
 }

@@ -71,7 +71,7 @@ function TransferTab(props: TransferTabProps) {
     const { token, onClose } = props
     const { t } = useI18N()
 
-    const { retryDetailedTokens } = useContext(DashboardWalletsContext)
+    const { detailedTokensRetry } = useContext(DashboardWalletsContext)
     const [amount, setAmount] = useState('')
     const [address, setAddress] = useState('')
     const [memo, setMemo] = useState('')
@@ -106,14 +106,17 @@ function TransferTab(props: TransferTabProps) {
     //#region remote controlled transaction dialog
     const [_, setTransactionDialogOpen] = useRemoteControlledDialog(
         EthereumMessages.events.transactionDialogUpdated,
-        (ev) => {
-            if (ev.open) return
-            resetTransferCallback()
-            if (transferState.type !== TransactionStateType.CONFIRMED) return
-            onClose()
-            retryDetailedTokens()
-            retryTokenBalance()
-        },
+        useCallback(
+            (ev) => {
+                if (ev.open) return
+                resetTransferCallback()
+                if (transferState.type !== TransactionStateType.CONFIRMED) return
+                onClose()
+                detailedTokensRetry()
+                retryTokenBalance()
+            },
+            [transferState.type],
+        ),
     )
 
     // open the transaction dialog

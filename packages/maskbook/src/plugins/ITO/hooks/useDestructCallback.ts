@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { useCallback } from 'react'
-import type { Tx } from '../../../contracts/types'
+import type { Tx } from '@dimensiondev/contracts/types/types'
 import { addGasMargin } from '../../../web3/helpers'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import type { TransactionReceipt } from 'web3-core'
@@ -8,9 +8,9 @@ import { TransactionStateType, useTransactionState } from '../../../web3/hooks/u
 import { TransactionEventType } from '../../../web3/types'
 import { useITO_Contract } from '../contracts/useITO_Contract'
 
-export function useDestructCallback() {
+export function useDestructCallback(isMask: boolean) {
     const account = useAccount()
-    const ITO_Contract = useITO_Contract()
+    const ITO_Contract = useITO_Contract(isMask)
     const [destructState, setDestructState] = useTransactionState()
 
     const destructCallback = useCallback(

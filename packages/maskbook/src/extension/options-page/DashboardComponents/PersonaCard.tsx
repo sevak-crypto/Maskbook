@@ -70,11 +70,13 @@ export default function PersonaCard({ persona }: Props) {
     const [renamePersona, openRenamePersona] = useModal(DashboardPersonaRenameDialog, { persona })
 
     const [menu, openMenu] = useMenu(
-        <MenuItem onClick={openRenamePersona}>{t('rename')}</MenuItem>,
-        <MenuItem onClick={openBackupPersona}>{t('backup')}</MenuItem>,
-        <MenuItem onClick={openDeletePersona} className={color.error} data-testid="delete_button">
-            {t('delete')}
-        </MenuItem>,
+        <>
+            <MenuItem onClick={openRenamePersona}>{t('rename')}</MenuItem>,
+            <MenuItem onClick={openBackupPersona}>{t('backup')}</MenuItem>,
+            <MenuItem onClick={openDeletePersona} className={color.error} data-testid="delete_button">
+                {t('delete')}
+            </MenuItem>
+        </>,
     )
 
     const id = persona.linkedProfiles.keys().next().value as ProfileIdentifier | undefined

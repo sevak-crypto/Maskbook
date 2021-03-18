@@ -9,11 +9,14 @@ import { ShareDialog } from './ShareDialog'
 import { ClaimDialog, ClaimDialogProps } from './ClaimDialog'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useChainId } from '../../../web3/hooks/useChainState'
+import { UnlockDialog } from './UnlockDialog'
+import { ERC20TokenDetailed, EthereumTokenType } from '../../../web3/types'
 
 export enum ClaimStatus {
     Remind,
     Swap,
     Share,
+    Unlock,
 }
 
 const useStyles = makeStyles((theme) =>
@@ -28,15 +31,18 @@ const useStyles = makeStyles((theme) =>
 
 interface ClaimGuideProps extends Pick<ClaimDialogProps, 'exchangeTokens' | 'payload'> {
     open: boolean
+    status: ClaimStatus
+    shareSuccessLink: string | undefined
     isBuyer: boolean
     retryPayload: () => void
+    onUpdate: (status: ClaimStatus) => void
     onClose: () => void
     DialogProps?: Partial<DialogProps>
 }
 
 export function ClaimGuide(props: ClaimGuideProps) {
     const { t } = useI18N()
-    const { payload, exchangeTokens, isBuyer, open, retryPayload, onClose } = props
+    const { status, payload, exchangeTokens, isBuyer, open, retryPayload, shareSuccessLink, onUpdate, onClose } = props
     const [startTransition] = unstable_useTransition({ busyDelayMs: 1000 })
     const onCloseShareDialog = useCallback(() => {
         startTransition(() => {
@@ -45,7 +51,6 @@ export function ClaimGuide(props: ClaimGuideProps) {
         })
     }, [retryPayload, startTransition, onClose])
     const classes = useStyles()
-    const [status, setStatus] = useState<ClaimStatus>(ClaimStatus.Remind)
     const maxSwapAmount = useMemo(
         () => BigNumber.min(new BigNumber(payload.limit), new BigNumber(payload.total_remaining)),
         [payload.limit, payload.total_remaining],
@@ -58,12 +63,13 @@ export function ClaimGuide(props: ClaimGuideProps) {
 
     const ClaimTitle: EnumRecord<ClaimStatus, string> = {
         [ClaimStatus.Remind]: t('plugin_ito_dialog_claim_reminder_title'),
+        [ClaimStatus.Unlock]: t('plugin_ito_dialog_claim_unlock_title'),
         [ClaimStatus.Swap]: t('plugin_ito_dialog_claim_swap_title', { token: payload.token.symbol }),
         [ClaimStatus.Share]: t('plugin_ito_dialog_claim_share_title'),
     }
 
     useEffect(() => {
-        setStatus(isBuyer ? ClaimStatus.Share : ClaimStatus.Remind)
+        onUpdate(isBuyer ? ClaimStatus.Share : ClaimStatus.Remind)
     }, [account, isBuyer, chainId, payload.chain_id])
 
     return (
@@ -71,12 +77,30 @@ export function ClaimGuide(props: ClaimGuideProps) {
             open={open}
             title={ClaimTitle[status]}
             onClose={status === ClaimStatus.Share ? onCloseShareDialog : onClose}
-            DialogProps={{ maxWidth: status === ClaimStatus.Swap ? 'xs' : 'sm' }}>
+            DialogProps={{ maxWidth: status === ClaimStatus.Swap || status === ClaimStatus.Unlock ? 'xs' : 'sm' }}>
             <DialogContent className={classes.content}>
                 {(() => {
                     switch (status) {
                         case ClaimStatus.Remind:
-                            return <RemindDialog token={payload.token} chainId={chainId} setStatus={setStatus} />
+                            return (
+                                <RemindDialog
+                                    isMask={payload.is_mask ?? false}
+                                    token={payload.token}
+                                    chainId={chainId}
+                                    setStatus={onUpdate}
+                                />
+                            )
+                        case ClaimStatus.Unlock:
+                            return (
+                                <UnlockDialog
+                                    isMask={payload.is_mask ?? false}
+                                    tokens={
+                                        payload.exchange_tokens.filter(
+                                            (x) => x.type === EthereumTokenType.ERC20,
+                                        ) as ERC20TokenDetailed[]
+                                    }
+                                />
+                            )
                         case ClaimStatus.Swap:
                             return (
                                 <ClaimDialog
@@ -89,13 +113,14 @@ export function ClaimGuide(props: ClaimGuideProps) {
                                     payload={payload}
                                     token={payload.token}
                                     exchangeTokens={exchangeTokens}
-                                    setStatus={setStatus}
+                                    setStatus={onUpdate}
                                     chainId={chainId}
                                 />
                             )
                         case ClaimStatus.Share:
                             return (
                                 <ShareDialog
+                                    shareSuccessLink={shareSuccessLink}
                                     poolName={payload.message}
                                     token={payload.token}
                                     actualSwapAmount={actualSwapAmount}

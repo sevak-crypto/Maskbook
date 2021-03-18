@@ -22,12 +22,14 @@ export function useERC20TokenDetailed(address: string, token?: Partial<ERC20Toke
 
     // validate
     const [results, calls, _, callback] = useSingleContractMultipleData(erc20TokenContract, names, callDatas)
-    const asyncResult = useAsyncRetry(() => callback(calls), [erc20TokenContract, names, callDatas])
+    const asyncResult = useAsyncRetry(() => callback(calls), [calls, callback])
 
     // compose
     const token_ = useMemo(() => {
         if (!erc20TokenContract) return
         const [name, symbol, decimals] = results.map((x) => (x.error ? undefined : x.value))
+        // not a valid erc20 token
+        if (!name && !symbol && !decimals) return
         return {
             type: EthereumTokenType.ERC20,
             address: formatChecksumAddress(address),
@@ -36,7 +38,7 @@ export function useERC20TokenDetailed(address: string, token?: Partial<ERC20Toke
             symbol: symbol ?? token?.symbol ?? '',
             decimals: decimals ? Number.parseInt(decimals, 10) : token?.decimals ?? 0,
         } as ERC20TokenDetailed
-    }, [erc20TokenContract, address, chainId, results, token?.name, token?.symbol, token?.decimals])
+    }, [erc20TokenContract, address, chainId, results, token])
 
     return {
         ...asyncResult,

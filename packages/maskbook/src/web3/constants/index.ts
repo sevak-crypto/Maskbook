@@ -12,14 +12,10 @@ export const CONSTANTS = {
             'https://www.coingecko.com/tokens_list/uniswap/defi_100/v_0_0_0.json',
             'https://gateway.ipfs.io/ipns/tokens.uniswap.org',
             'http://tokenlist.dharma.eth.link',
-            'https://raw.githubusercontent.com/DimensionDev/Maskbook-Token-List/gh-pages/maskbook.json',
+            'https://dimensiondev.github.io/Mask-Token-List/mask.json',
         ],
-        [ChainId.Ropsten]: [
-            'https://raw.githubusercontent.com/DimensionDev/Maskbook-Token-List/gh-pages/maskbook.json',
-        ],
-        [ChainId.Rinkeby]: [
-            'https://raw.githubusercontent.com/DimensionDev/Maskbook-Token-List/gh-pages/maskbook.json',
-        ],
+        [ChainId.Ropsten]: ['https://dimensiondev.github.io/Mask-Token-List/mask.json'],
+        [ChainId.Rinkeby]: ['https://dimensiondev.github.io/Mask-Token-List/mask.json'],
         [ChainId.Kovan]: [],
         [ChainId.Gorli]: [],
     },
@@ -45,14 +41,14 @@ export const CONSTANTS = {
         [ChainId.Mainnet]: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
         [ChainId.Ropsten]: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
         [ChainId.Rinkeby]: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
-        [ChainId.Kovan]: '',
+        [ChainId.Kovan]: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
         [ChainId.Gorli]: '',
     },
     USDC_ADDRESS: {
         [ChainId.Mainnet]: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
         [ChainId.Ropsten]: '0x0D9C8723B343A8368BebE0B5E89273fF8D712e3C',
         [ChainId.Rinkeby]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
-        [ChainId.Kovan]: '',
+        [ChainId.Kovan]: '0x2F375e94FC336Cdec2Dc0cCB5277FE59CBf1cAe5',
         [ChainId.Gorli]: '',
     },
     USDT_ADDRESS: {
@@ -87,6 +83,13 @@ export const CONSTANTS = {
         [ChainId.Mainnet]: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
         [ChainId.Ropsten]: '',
         [ChainId.Rinkeby]: '',
+        [ChainId.Kovan]: '',
+        [ChainId.Gorli]: '',
+    },
+    MASK_ADDRESS: {
+        [ChainId.Mainnet]: '0x69af81e73A73B40adF4f3d4223Cd9b1ECE623074',
+        [ChainId.Ropsten]: '0x5B966f3a32Db9C180843bCb40267A66b73E4f022',
+        [ChainId.Rinkeby]: '0xFD9Eb54f6aC885079e7bB3E207922Bb7256E3fcb',
         [ChainId.Kovan]: '',
         [ChainId.Gorli]: '',
     },
@@ -129,7 +132,7 @@ export const CONSTANTS = {
         [ChainId.Mainnet]: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
         [ChainId.Ropsten]: '0x31f42841c2db5173425b5223809cf3a38fede360',
         [ChainId.Rinkeby]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-        [ChainId.Kovan]: '',
+        [ChainId.Kovan]: '0x1528F3FCc26d13F7079325Fb78D9442607781c8C',
         [ChainId.Gorli]: '',
     },
     AMPL_ADDRESS: {
@@ -197,21 +200,35 @@ export const CONSTANTS = {
     },
 
     // settings
-    INFURA_ADDRESS:
-        process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+    PROVIDER_ADDRESS_LIST:
+        process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || process.env.build === 'beta'
             ? {
-                  [ChainId.Mainnet]: 'https://mainnet.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195',
-                  [ChainId.Ropsten]: 'https://ropsten.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195',
-                  [ChainId.Rinkeby]: 'https://rinkeby.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195',
-                  [ChainId.Kovan]: 'https://kovan.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195',
-                  [ChainId.Gorli]: 'https://goerli.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195',
+                  [ChainId.Mainnet]: ['https://mainnet.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195'],
+                  [ChainId.Ropsten]: ['https://ropsten.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195'],
+                  [ChainId.Rinkeby]: ['https://rinkeby.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195'],
+                  [ChainId.Kovan]: ['https://kovan.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195'],
+                  [ChainId.Gorli]: ['https://goerli.infura.io/v3/4ab93ab12e864f0eb58fae67143e0195'],
               }
             : {
-                  [ChainId.Mainnet]:
+                  [ChainId.Mainnet]: [
+                      'https://damp-holy-water.quiknode.pro/d5bcb6c5e265afd11fecb0d52275afa961487a29/',
+                      'https://mainnet.infura.io/v3/50676f4e9b9d4780a34fc8a503ff7f4f',
                       'https://throbbing-blue-bird.quiknode.io/73e66978-1a45-4f91-97f3-25d59b51a00e/YScEAjYfzZqNphokjzn-Zt3sZsOd0Nav5sauA3j03se0LOseR8PQFyBfINzhYStWrg44VfLLfCFE34FR2CA_kQ==/',
-                  [ChainId.Ropsten]: 'https://ropsten.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5',
-                  [ChainId.Rinkeby]: 'https://rinkeby.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5',
-                  [ChainId.Kovan]: 'https://kovan.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5',
-                  [ChainId.Gorli]: 'https://goerli.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5',
+                      'http://api.taichi.network:10000/rpc/112c84849b6014ce1b970d8b81e9bb4a',
+                  ],
+                  [ChainId.Ropsten]: ['https://ropsten.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5'],
+                  [ChainId.Rinkeby]: ['https://rinkeby.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5'],
+                  [ChainId.Kovan]: ['https://kovan.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5'],
+                  [ChainId.Gorli]: ['https://goerli.infura.io/v3/11f8b6b36f4a408e85d8a4e52d31edc5'],
               },
+    PROVIDER_WEIGHT_LIST: {
+        [ChainId.Mainnet]:
+            process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' || process.env.build === 'beta'
+                ? [0, 0, 0, 0, 0] // 0 - 100%
+                : [0, 0, 1, 2, 3], // 0 - 40%, 1 - 20%, 2 - 20%, 3 - 20%
+        [ChainId.Ropsten]: [0, 0, 0, 0, 0], // 0 - 100%
+        [ChainId.Rinkeby]: [0, 0, 0, 0, 0], // 0 - 100%
+        [ChainId.Kovan]: [0, 0, 0, 0, 0], // 0 - 100%
+        [ChainId.Gorli]: [0, 0, 0, 0, 0], // 0 - 100%
+    },
 }

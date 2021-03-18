@@ -1,55 +1,100 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
-import { useAccount } from './useAccount'
+import { useCallback, useMemo } from 'react'
+import { once } from 'lodash-es'
+import type { TransactionReceipt } from 'web3-eth'
+import type { Tx } from '@dimensiondev/contracts/types/types'
 import { useERC20TokenContract } from '../contracts/useERC20TokenContract'
+import { addGasMargin } from '../helpers'
+import { TransactionEventType } from '../types'
+import { useAccount } from './useAccount'
 import { useERC20TokenAllowance } from './useERC20TokenAllowance'
-import { useTransactionReceipt } from './useTransaction'
 import { useERC20TokenBalance } from './useERC20TokenBalance'
+import { TransactionStateType, useTransactionState } from './useTransactionState'
 
 const MaxUint256 = new BigNumber('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').toFixed()
 
-export enum ApproveState {
+export enum ApproveStateType {
     UNKNOWN,
     INSUFFICIENT_BALANCE,
     NOT_APPROVED,
     UPDATING,
     PENDING,
     APPROVED,
+    FAILED,
 }
 
 export function useERC20TokenApproveCallback(address: string, amount?: string, spender?: string) {
     const account = useAccount()
     const erc20Contract = useERC20TokenContract(address)
-    const { value: balance = '0', loading: loadingBalance, retry: revalidateBalance } = useERC20TokenBalance(address)
-    const { value: allowance = '0', loading: loadingAllowance, retry: revalidateAllowance } = useERC20TokenAllowance(
-        address,
+    const [transactionState, setTransactionState] = useTransactionState()
+
+    // read the approved information from the chain
+    const {
+        value: balance = '0',
+        loading: loadingBalance,
+        error: errorBalance,
+        retry: revalidateBalance,
+    } = useERC20TokenBalance(address)
+    const {
+        value: allowance = '0',
+        loading: loadingAllowance,
+        error: errorAllowance,
+        retry: revalidateAllowance,
+    } = useERC20TokenAllowance(address, spender)
+
+    // the computed approve state
+    const approveStateType = useMemo(() => {
+        if (!amount || !spender) return ApproveStateType.UNKNOWN
+        if (loadingBalance || loadingAllowance) return ApproveStateType.UPDATING
+        if (errorBalance || errorAllowance) return ApproveStateType.FAILED
+        if (new BigNumber(amount).isGreaterThan(new BigNumber(balance))) return ApproveStateType.INSUFFICIENT_BALANCE
+        if (transactionState.type === TransactionStateType.WAIT_FOR_CONFIRMING) return ApproveStateType.PENDING
+        return new BigNumber(allowance).isLessThan(amount) ? ApproveStateType.NOT_APPROVED : ApproveStateType.APPROVED
+    }, [
+        amount,
         spender,
-    )
-
-    const [approveHash, setApproveHash] = useState('')
-    const receipt = useTransactionReceipt(approveHash)
-
-    const approveState: ApproveState = useMemo(() => {
-        if (receipt?.blockHash) return ApproveState.APPROVED
-        if (!amount || !spender || !allowance || !balance) return ApproveState.UNKNOWN
-        if (new BigNumber(amount).isGreaterThan(new BigNumber(balance))) return ApproveState.INSUFFICIENT_BALANCE
-        if (approveHash && !receipt?.blockHash) return ApproveState.PENDING
-        return new BigNumber(allowance).isLessThan(amount) ? ApproveState.NOT_APPROVED : ApproveState.APPROVED
-    }, [address, amount, spender, allowance, balance, approveHash, receipt?.blockHash])
+        balance,
+        allowance,
+        errorBalance,
+        errorAllowance,
+        loadingAllowance,
+        loadingBalance,
+        transactionState.type,
+    ])
 
     const approveCallback = useCallback(
         async (useExact: boolean = false) => {
-            if (approveState !== ApproveState.NOT_APPROVED) return
-            if (!account || !spender || !erc20Contract) return
-            if (!amount || new BigNumber(amount).isZero()) return
+            if (approveStateType === ApproveStateType.UNKNOWN || !amount || !spender || !erc20Contract) {
+                setTransactionState({
+                    type: TransactionStateType.UNKNOWN,
+                })
+                return
+            }
 
+            // error: failed to approve token
+            if (approveStateType !== ApproveStateType.NOT_APPROVED) {
+                setTransactionState({
+                    type: TransactionStateType.FAILED,
+                    error: new Error('Failed to approve token'),
+                })
+                return
+            }
+
+            // pre-step: start waiting for provider to confirm tx
+            setTransactionState({
+                type: TransactionStateType.WAIT_FOR_CONFIRMING,
+            })
+
+            const config: Tx = {
+                from: account,
+                to: erc20Contract.options.address,
+            }
+
+            // step 1: estimate gas
             const estimatedGas = await erc20Contract.methods
                 // general fallback for tokens who restrict approval amounts
                 .approve(spender, useExact ? amount : MaxUint256)
-                .estimateGas({
-                    from: account,
-                    to: erc20Contract.options.address,
-                })
+                .estimateGas(config)
                 .catch(() => {
                     // if the current approve strategy is failed
                     // then use oppsite strategy instead
@@ -60,41 +105,64 @@ export function useERC20TokenApproveCallback(address: string, amount?: string, s
                     })
                 })
 
-            return new Promise<string>((resolve, reject) => {
-                erc20Contract.methods.approve(spender, useExact ? amount : MaxUint256).send(
-                    {
-                        gas: estimatedGas,
-                        from: account,
-                        to: erc20Contract.options.address,
-                    },
-                    (error, hash) => {
-                        if (error) reject(error)
-                        else {
-                            resolve(hash)
-                            setApproveHash(hash)
-                        }
-                    },
-                )
+            // step 2: blocking
+            return new Promise<void>(async (resolve, reject) => {
+                const promiEvent = erc20Contract.methods.approve(spender, useExact ? amount : MaxUint256).send({
+                    gas: addGasMargin(new BigNumber(estimatedGas)).toFixed(),
+                    ...config,
+                })
+                const revalidate = once(() => {
+                    revalidateBalance()
+                    revalidateAllowance()
+                })
+                promiEvent.on(TransactionEventType.RECEIPT, (receipt: TransactionReceipt) => {
+                    setTransactionState({
+                        type: TransactionStateType.CONFIRMED,
+                        no: 0,
+                        receipt,
+                    })
+                    revalidate()
+                })
+                promiEvent.on(TransactionEventType.CONFIRMATION, (no: number, receipt: TransactionReceipt) => {
+                    setTransactionState({
+                        type: TransactionStateType.CONFIRMED,
+                        no,
+                        receipt,
+                    })
+                    revalidate()
+                    resolve()
+                })
+                promiEvent.on(TransactionEventType.ERROR, (error: Error) => {
+                    setTransactionState({
+                        type: TransactionStateType.FAILED,
+                        error,
+                    })
+                    revalidate()
+                    reject(error)
+                })
             })
         },
-        [approveState, amount, account, spender, erc20Contract],
+        [account, amount, balance, spender, loadingAllowance, loadingBalance, erc20Contract, approveStateType],
     )
 
-    const resetCallback = useCallback(() => {}, [])
-
-    // reset approve state
-    useEffect(() => {
-        setApproveHash('')
-    }, [address, amount, spender])
-
-    useEffect(() => {
-        // should not revalidate if never validated before
-        if (!allowance || !balance) return
-        // revalidate balance and allowance if tx hash was cleaned
-        if (approveHash) return
+    const resetCallback = useCallback(() => {
         revalidateBalance()
         revalidateAllowance()
-    }, [approveHash])
+        setTransactionState({
+            type: TransactionStateType.UNKNOWN,
+        })
+    }, [revalidateBalance, revalidateAllowance])
 
-    return [approveState, approveCallback, resetCallback] as const
+    return [
+        {
+            type: approveStateType,
+            allowance,
+            amount,
+            spender,
+            balance,
+        },
+        transactionState,
+        approveCallback,
+        resetCallback,
+    ] as const
 }
