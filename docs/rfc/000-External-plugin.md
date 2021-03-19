@@ -10,7 +10,8 @@
 
 An external plugin should be an isolated website, which means it should not be loaded or installed onto the Mask Network.
 
-When Mask Network detects the metadata of an external plugin, it will try to fetch the manifest and display the content in the payload. This process **must not** involve dynamic code execution.
+When Mask Network detects the metadata of an external plugin, it will try to fetch the manifest and display the content in the payload. 
+This process **must not** involve dynamic code execution.
 
 When the user decides to interact with the external plugin, Mask Network will open a popup window and inject some APIs to it.
 
@@ -46,7 +47,8 @@ User sees the plugin UI rendered by the Mask Network. Partial info, such as on-c
 User clicks on the post card to interact with the plugin.
 
 A popup window appears.
-If Mask Network has no permission to the plugin site, Mask Network will jump to a permission granting page first.
+If Mask Network has no permission to the plugin site, 
+Mask Network will jump to a permission granting page first.
 After permissions granted, the plugin page will appear.
 
 User interacts with the plugin.
@@ -57,11 +59,13 @@ User interacts with the plugin.
 
 A plugin should be deployed on a static HTTPs URL, for example <https://example.com/my-plugin>, let's call it _base url_.
 
-It should provide a manifest file called "mask-plugin-manifest.json". For the example above, it should be located at <https://example.com/my-plugin/mask-plugin-manifest.json>. It should be in JSONC (JSON with comment) format.
+It should provide a manifest file called "mask-plugin-manifest.json". 
+For the example above, it should be located at <https://example.com/my-plugin/mask-plugin-manifest.json>. 
+It should also be in JSONC (JSON with comment) format.
 
 The manifest file should match the following shape:
 
-```ts
+```typescript
 interface ExternalPluginManifestFile {
   manifest_version: 0
   name: string
@@ -70,9 +74,21 @@ interface ExternalPluginManifestFile {
   code_sign: URL
   integrity?: Record<URL, string>
   i18n?: Record<Language, URL>
-  payload_preview?: Record<PayloadMetadataKey, SupportedPayloadPreviews>
+  metadata?: Record<PayloadMetadataKey, MetadataDetail>
+  contribution?: {
+    composition?: {
+      target: URL
+      icon: string | URL
+    }
+  }
 }
+
 type KnownPayloadTemplates = 'Card_1'
+interface MetadataDetail {
+  // points to the JSON schema to validate if it is valid
+  schema?: URL
+  preview?: SupportedPayloadPreviews
+}
 interface SupportedPayloadPreviews extends Record<KnownPayloadTemplates, URL> {
   prefer?: KnownPayloadTemplates
 }
@@ -103,10 +119,21 @@ Here is an example:
     "zh": "./zh.json",
     "ja": "./ja.json"
   },
-  "payload_preview": {
+  "metadata": {
     // In Mask it will be plugin:example.com/my-plugin:kind:1
     "kind1:1": {
-      "Card_1": "./preview/Card_1.json"
+      "schema": "./kind1-v1.schema.json",
+      "preview": {
+        "Card_1": "./preview/Card_1.json"
+      }
+    }
+  },
+  "contribution": {
+    // This allows to add a new badge in
+    // the composition dialog once user added the plugin
+    "composition": {
+      "icon": "./badge.svg",
+      "target": "./compose.html"
     }
   }
 }
@@ -127,7 +154,7 @@ we can provide some common templates allowing developers to interpolate with.
 
 Here is an example of `./preview/Card_1.json`
 
-```json
+```jsonc
 {
   "plugin": {
     // $ refers to the payload
@@ -162,7 +189,7 @@ Here is an example of `./preview/Card_1.json`
 
 Report the payload back to the composition.
 
-```ts
+```typescript
 Mask.setMetadata('kind1:1', {
   title,
   description,
@@ -170,6 +197,6 @@ Mask.setMetadata('kind1:1', {
 })
 ```
 
-#### Mask.permission.query/request/revoke
+#### Mask.permission.{query,request,revoke}
 
 Manage permissions
