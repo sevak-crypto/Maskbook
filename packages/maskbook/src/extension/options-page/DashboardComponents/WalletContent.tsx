@@ -1,5 +1,4 @@
 import { forwardRef, useCallback, useState } from 'react'
-import { pick } from 'lodash-es'
 import { Button, Box, IconButton, MenuItem, Tabs, Tab, Alert } from '@material-ui/core'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import AddIcon from '@material-ui/icons/Add'
@@ -28,7 +27,6 @@ import { CollectibleList } from './CollectibleList'
 import { useAccount } from '../../../web3/hooks/useAccount'
 import { useCollectiblesFromNetwork, useCollectiblesFromDB } from '../../../plugins/Wallet/hooks/useCollectibles'
 import { AssetProvider } from '../../../plugins/Wallet/types'
-import type { AssetInCard } from '../../../plugins/Wallet/apis/opensea'
 
 const useStyles = makeStyles((theme) =>
     createStyles({
